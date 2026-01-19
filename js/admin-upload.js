@@ -242,21 +242,27 @@ function updatePreviews() {
 
 // Update upload button state
 function updateUploadButton() {
+    if (!uploadBtn) return;
+    
     const gallerySelect = document.getElementById('gallery');
     if (!gallerySelect) {
         uploadBtn.disabled = true;
         return;
     }
-    const gallery = gallerySelect.value;
-    uploadBtn.disabled = selectedImages.length === 0 || !gallery;
     
-    // Debug log
-    if (selectedImages.length > 0 && !gallery) {
-        console.log('Upload button disabled: Gallery not selected');
-    } else if (selectedImages.length === 0) {
-        console.log('Upload button disabled: No images selected');
+    const gallery = gallerySelect.value;
+    const hasImages = selectedImages.length > 0;
+    const hasGallery = gallery && gallery !== '';
+    
+    uploadBtn.disabled = !hasImages || !hasGallery;
+    
+    // Visual feedback
+    if (hasImages && !hasGallery) {
+        uploadBtn.title = 'Please select a gallery';
+    } else if (!hasImages) {
+        uploadBtn.title = 'Please select images to upload';
     } else {
-        console.log('Upload button enabled');
+        uploadBtn.title = '';
     }
 }
 

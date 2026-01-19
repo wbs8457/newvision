@@ -319,6 +319,7 @@
                 sessionStorage.setItem('adminAuthTime', Date.now().toString());
                 document.getElementById('passwordPrompt').classList.add('hidden');
                 document.getElementById('adminContent').style.display = 'block';
+                return true; // Return true to indicate success
             } else {
                 errorDiv.textContent = 'Incorrect password';
                 errorDiv.style.display = 'block';
@@ -365,26 +366,30 @@
             }
         });
         
-        // Update checkPassword to initialize galleries after auth
+        // Wrap checkPassword to initialize galleries after auth
         const originalCheckPassword = window.checkPassword;
         window.checkPassword = async function() {
-            const result = await originalCheckPassword();
+            const result = originalCheckPassword();
             // After successful auth, initialize galleries
-            if (result) {
-                setTimeout(async () => {
+            setTimeout(async () => {
+                if (document.getElementById('adminContent').style.display === 'block') {
                     if (typeof populateGalleryDropdown === 'function') {
                         await populateGalleryDropdown();
                         const gallerySelect = document.getElementById('gallery');
                         if (gallerySelect) {
-                            gallerySelect.addEventListener('change', updateUploadButton);
+                            // Remove old listener if exists, add new one
+                            const newSelect = gallerySelect.cloneNode(true);
+                            gallerySelect.parentNode.replaceChild(newSelect, gallerySelect);
+                            document.getElementById('gallery').addEventListener('change', updateUploadButton);
                         }
                         // Update button state after galleries load
                         if (typeof updateUploadButton === 'function') {
                             updateUploadButton();
                         }
                     }
-                }, 200);
-            }
+                }
+            }, 300);
+            return result;
         };
     </script>
 </body>
