@@ -104,9 +104,17 @@ function createGalleryItem(image, index) {
     const galleryId = image.gallery || 'all';
     const galleryClass = galleryId ? `gallery-${galleryId}` : '';
     
+    // Build description for lightbox
+    const lightboxDescription = image.description 
+        ? `${image.title || ''}\n${image.description}`.trim()
+        : (image.title || '');
+    
     return `
         <div class="col-md-6 col-lg-4 mb-4 gallery-item ${galleryClass}" data-gallery="${galleryId}" data-index="${index}">
-            <a href="${fullImageUrl}" data-glightbox="type: image" data-glightbox-title="${image.title || ''}">
+            <a href="${fullImageUrl}" 
+               data-glightbox="type: image" 
+               data-glightbox-title="${image.title || ''}"
+               data-glightbox-description="${image.description || ''}">
                 <div class="ratio ratio-4x3">
                     <img src="${imageUrl}" 
                          alt="${image.alt || image.title || 'Gallery image'}" 
@@ -296,7 +304,10 @@ async function loadFeaturedImages() {
         
         const itemHTML = `
             <div class="col-md-6 col-lg-4 mb-4">
-                <a href="${fullImageUrl}" data-glightbox="type: image" data-glightbox-title="${image.title || ''}">
+                <a href="${fullImageUrl}" 
+                   data-glightbox="type: image" 
+                   data-glightbox-title="${image.title || ''}"
+                   data-glightbox-description="${image.description || ''}">
                     <div class="ratio ratio-4x3 gallery-item">
                         <img src="${imageUrl}" 
                              alt="${image.alt || image.title || 'Featured image'}" 

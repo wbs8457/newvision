@@ -204,6 +204,13 @@
                             <!-- Image Previews -->
                             <div id="imagePreviews" class="mb-3"></div>
 
+                            <!-- Description Field (optional, applies to all images) -->
+                            <div class="mb-3">
+                                <label for="imageDescription" class="form-label">Description (Optional)</label>
+                                <textarea class="form-control" id="imageDescription" rows="2" placeholder="Enter a description for these images (will apply to all selected images)"></textarea>
+                                <small class="text-muted">You can edit individual descriptions later in the Image Manager</small>
+                            </div>
+
                             <!-- Upload Button -->
                             <button type="submit" class="btn btn-primary btn-lg w-100" id="uploadBtn" disabled>
                                 <i class="bi bi-cloud-upload me-2"></i>Upload Images
@@ -281,6 +288,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="js/admin-upload.js"></script>
     <script src="js/gallery-manager.js"></script>
+    <script src="js/image-manager.js"></script>
     
     <!-- Password Protection Script -->
     <script>

@@ -462,6 +462,8 @@ async function handleUpload(e) {
         selectedImages = [];
         updatePreviews();
         uploadForm.reset();
+        const descriptionField = document.getElementById('imageDescription');
+        if (descriptionField) descriptionField.value = '';
         updateUploadButton();
         
     } catch (error) {
