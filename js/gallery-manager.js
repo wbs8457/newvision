@@ -156,6 +156,68 @@ function removeGallery(index) {
     }
 }
 
+// Upload default galleries to R2
+async function uploadDefaultGalleries() {
+    const defaultGalleries = {
+        "galleries": [
+            {
+                "id": "portraits",
+                "name": "Portraits",
+                "description": "Professional portrait photography"
+            },
+            {
+                "id": "events",
+                "name": "Events",
+                "description": "Wedding and event photography"
+            },
+            {
+                "id": "nature",
+                "name": "Nature",
+                "description": "Landscape and nature photography"
+            },
+            {
+                "id": "commercial",
+                "name": "Commercial",
+                "description": "Commercial and business photography"
+            }
+        ]
+    };
+    
+    const jsonString = JSON.stringify(defaultGalleries, null, 2);
+    const blob = new Blob([jsonString], { type: 'application/json' });
+    
+    const formData = new FormData();
+    formData.append('image', blob, 'galleries.json');
+    formData.append('key', 'data/galleries.json');
+    formData.append('contentType', 'application/json');
+    
+    try {
+        const response = await fetch(R2_CONFIG.workerUrl, {
+            method: 'POST',
+            body: formData
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok) {
+            alert('✅ Successfully uploaded default galleries.json to R2!');
+            // Reload galleries
+            await populateGalleryDropdown();
+            if (typeof loadGalleriesForManagement === 'function') {
+                // Refresh gallery manager if open
+                const modal = bootstrap.Modal.getInstance(document.getElementById('galleryManagerModal'));
+                if (modal && modal._isShown) {
+                    await showGalleryManager();
+                }
+            }
+        } else {
+            alert('❌ Upload failed: ' + (result.error || 'Unknown error'));
+        }
+    } catch (error) {
+        alert('❌ Error: ' + error.message);
+    }
+}
+
 // Save galleries
 async function saveGalleries() {
     // Validate galleries
