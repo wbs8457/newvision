@@ -393,13 +393,17 @@ async function handleUpload(e) {
                     item.uploadError = error.message || 'Direct upload requires AWS Signature V4. Use manual upload.';
                 }
                 
+                // Get description from form or use default
+                const descriptionField = document.getElementById('imageDescription');
+                const description = descriptionField ? descriptionField.value.trim() : '';
+                
                 // Generate gallery entry
                 const entry = {
                     filename: filename,
                     gallery: gallery, // Changed from category to gallery
                     title: baseName.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
                     alt: `${gallery} photography - ${baseName.replace(/-/g, ' ')}`,
-                    description: `Uploaded ${new Date().toLocaleDateString()}`,
+                    description: description || `Uploaded ${new Date().toLocaleDateString()}`,
                     featured: featured,
                     date: new Date().toISOString().split('T')[0]
                 };

@@ -4,6 +4,24 @@
 let allImages = [];
 let currentFilter = 'all';
 
+// Import loadGalleries from gallery-manager.js (assumes it's loaded globally)
+async function loadGalleries() {
+    if (typeof loadGalleriesForManagement === 'function') {
+        return await loadGalleriesForManagement();
+    }
+    // Fallback
+    try {
+        const response = await fetch('data/galleries.json');
+        if (response.ok) {
+            const data = await response.json();
+            return data.galleries || [];
+        }
+    } catch (error) {
+        console.error('Error loading galleries:', error);
+    }
+    return [];
+}
+
 // Load all images from gallery.json
 async function loadAllImages() {
     const workerUrl = R2_CONFIG.workerUrl;
