@@ -19,8 +19,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-    <!-- Lightbox2 CSS -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/css/lightbox.min.css">
+    <!-- GLightbox CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/glightbox/dist/css/glightbox.min.css">
     <!-- Custom CSS -->
     <link rel="stylesheet" href="css/custom.css">
     
@@ -131,39 +131,33 @@
 
     <!-- Bootstrap 5 JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- GLightbox JS -->
+    <script src="https://cdn.jsdelivr.net/npm/glightbox/dist/js/glightbox.min.js"></script>
     <!-- Custom JS -->
     <script src="js/utils.js"></script>
     <script src="js/main.js"></script>
     <script>
-        // Load gallery first, then load Lightbox2 after gallery is ready
+        // Initialize GLightbox after gallery loads
+        let lightboxInstance = null;
+        
         document.addEventListener('DOMContentLoaded', async function() {
             if (typeof loadGallery === 'function') {
                 try {
-                    // Load gallery (creates DOM elements with data-lightbox attributes)
+                    // Load gallery (creates DOM elements)
                     await loadGallery();
                     
-                    // Wait for DOM to fully update
-                    await new Promise(resolve => setTimeout(resolve, 200));
+                    // Wait for DOM to update
+                    await new Promise(resolve => setTimeout(resolve, 100));
                     
-                    // Now load Lightbox2 after gallery items exist
-                    const script = document.createElement('script');
-                    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/js/lightbox.min.js';
-                    script.async = true;
-                    script.onload = function() {
-                        // Configure after Lightbox2 loads
-                        setTimeout(() => {
-                            if (typeof lightbox !== 'undefined' && typeof lightbox.option === 'function') {
-                                try {
-                                    if (window.SITE_CONFIG?.lightbox) {
-                                        lightbox.option(window.SITE_CONFIG.lightbox);
-                                    }
-                                } catch (error) {
-                                    console.error('Lightbox config error:', error);
-                                }
-                            }
-                        }, 100);
-                    };
-                    document.head.appendChild(script);
+                    // Initialize GLightbox
+                    if (typeof GLightbox !== 'undefined') {
+                        lightboxInstance = GLightbox({
+                            selector: 'a[data-glightbox]',
+                            touchNavigation: true,
+                            loop: true,
+                            autoplayVideos: false
+                        });
+                    }
                 } catch (error) {
                     console.error('Error loading gallery:', error);
                 }

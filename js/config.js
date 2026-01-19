@@ -45,12 +45,11 @@ const SITE_CONFIG = {
         // base: 'https://wbsnewvision.com', // Custom domain example
     },
     
-    // Lightbox Settings
+    // Lightbox Settings (GLightbox)
     lightbox: {
-        resizeDuration: 200,
-        wrapAround: true,
-        showImageNumberLabel: true,
-        alwaysShowNavOnTouchDevices: true,
+        touchNavigation: true,
+        loop: true,
+        autoplayVideos: false,
     },
     
     // SEO Settings
