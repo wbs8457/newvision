@@ -1,0 +1,170 @@
+{
+  "images": [
+    {
+      "filename": "portrait-001.webp",
+      "category": "portraits",
+      "title": "Portrait Session",
+      "alt": "Professional portrait photography",
+      "description": "A beautiful portrait session showcasing natural lighting and composition",
+      "featured": true,
+      "date": "2024-01-15"
+    },
+    {
+      "filename": "event-001.webp",
+      "category": "events",
+      "title": "Wedding Celebration",
+      "alt": "Wedding event photography",
+      "description": "Capturing the joy and emotion of a special day",
+      "featured": true,
+      "date": "2024-01-20"
+    },
+    {
+      "filename": "nature-001.webp",
+      "category": "nature",
+      "title": "Mountain Landscape",
+      "alt": "Nature landscape photography",
+      "description": "Stunning mountain vista at golden hour",
+      "featured": true,
+      "date": "2024-01-25"
+    },
+    {
+      "filename": "commercial-001.webp",
+      "category": "commercial",
+      "title": "Product Photography",
+      "alt": "Commercial product photography",
+      "description": "Professional product photography for business",
+      "featured": true,
+      "date": "2024-02-01"
+    },
+    {
+      "filename": "portrait-002.webp",
+      "category": "portraits",
+      "title": "Family Portrait",
+      "alt": "Family portrait photography",
+      "description": "A warm family portrait session",
+      "featured": true,
+      "date": "2024-02-05"
+    },
+    {
+      "filename": "event-002.webp",
+      "category": "events",
+      "title": "Corporate Event",
+      "alt": "Corporate event photography",
+      "description": "Professional coverage of a corporate gathering",
+      "featured": false,
+      "date": "2024-02-10"
+    },
+    {
+      "filename": "portrait-003.webp",
+      "category": "portraits",
+      "title": "Senior Portrait",
+      "alt": "Senior portrait photography",
+      "description": "Elegant senior portrait session",
+      "featured": false,
+      "date": "2024-02-15"
+    },
+    {
+      "filename": "nature-002.webp",
+      "category": "nature",
+      "title": "Sunset Over Lake",
+      "alt": "Nature sunset photography",
+      "description": "Breathtaking sunset reflecting on calm waters",
+      "featured": false,
+      "date": "2024-02-20"
+    },
+    {
+      "filename": "event-003.webp",
+      "category": "events",
+      "title": "Anniversary Party",
+      "alt": "Anniversary event photography",
+      "description": "Celebrating a milestone anniversary",
+      "featured": false,
+      "date": "2024-02-25"
+    },
+    {
+      "filename": "commercial-002.webp",
+      "category": "commercial",
+      "title": "Professional Headshot",
+      "alt": "Business headshot photography",
+      "description": "Professional headshot for business use",
+      "featured": false,
+      "date": "2024-03-01"
+    },
+    {
+      "filename": "portrait-004.webp",
+      "category": "portraits",
+      "title": "Couple Portrait",
+      "alt": "Couple portrait photography",
+      "description": "Romantic couple portrait session",
+      "featured": false,
+      "date": "2024-03-05"
+    },
+    {
+      "filename": "nature-003.webp",
+      "category": "nature",
+      "title": "Forest Path",
+      "alt": "Nature forest photography",
+      "description": "Serene forest path in morning light",
+      "featured": false,
+      "date": "2024-03-10"
+    },
+    {
+      "filename": "event-004.webp",
+      "category": "events",
+      "title": "Birthday Celebration",
+      "alt": "Birthday event photography",
+      "description": "Joyful birthday celebration captured",
+      "featured": false,
+      "date": "2024-03-15"
+    },
+    {
+      "filename": "commercial-003.webp",
+      "category": "commercial",
+      "title": "Restaurant Photography",
+      "alt": "Commercial restaurant photography",
+      "description": "Appetizing food and restaurant ambiance",
+      "featured": false,
+      "date": "2024-03-20"
+    },
+    {
+      "filename": "portrait-005.webp",
+      "category": "portraits",
+      "title": "Maternity Portrait",
+      "alt": "Maternity portrait photography",
+      "description": "Beautiful maternity portrait session",
+      "featured": false,
+      "date": "2024-03-25"
+    },
+    {
+      "filename": "nature-004.webp",
+      "category": "nature",
+      "title": "Ocean Waves",
+      "alt": "Nature ocean photography",
+      "description": "Powerful ocean waves at dawn",
+      "featured": false,
+      "date": "2024-04-01"
+    }
+  ],
+  "categories": [
+    {
+      "id": "portraits",
+      "name": "Portraits",
+      "description": "Professional portrait photography"
+    },
+    {
+      "id": "events",
+      "name": "Events",
+      "description": "Wedding and event photography"
+    },
+    {
+      "id": "nature",
+      "name": "Nature",
+      "description": "Landscape and nature photography"
+    },
+    {
+      "id": "commercial",
+      "name": "Commercial",
+      "description": "Commercial and business photography"
+    }
+  ]
+}

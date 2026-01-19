@@ -1,0 +1,22 @@
+// Local Tokens Configuration (DO NOT COMMIT)
+// Copy this file to tokens.local.js and add your actual tokens
+// tokens.local.js is already in .gitignore
+
+const LOCAL_TOKENS = {
+    // GitHub Personal Access Token
+    // Create at: https://github.com/settings/tokens
+    githubToken: 'your-github-token-here',
+    
+    // Cloudflare R2 Auth Token
+    // Get from: Cloudflare Dashboard > R2 > Manage R2 API Tokens
+    cloudflareR2Token: 'your-cloudflare-r2-token-here',
+    
+    // Optional: R2 Account ID and Bucket Name
+    r2AccountId: 'your-account-id',
+    r2BucketName: 'your-bucket-name',
+};
+
+// Export for use in scripts
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = LOCAL_TOKENS;
+}

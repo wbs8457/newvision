@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="WBS New Vision - Professional Photography Services. Showcasing portraits, events, nature, and commercial photography.">
+    <title>WBS New Vision - Professional Photography</title>
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="" id="og-url">
+    <meta property="og:title" content="WBS New Vision - Professional Photography">
+    <meta property="og:description" content="Capturing life's beautiful moments through professional photography. Specializing in portraits, events, nature, and commercial photography.">
+    <meta property="og:image" content="https://picsum.photos/id/1005/1200/630">
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="" id="twitter-url">
+    <meta property="twitter:title" content="WBS New Vision - Professional Photography">
+    <meta property="twitter:description" content="Capturing life's beautiful moments through professional photography.">
+    <meta property="twitter:image" content="https://picsum.photos/id/1005/1200/630">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📷</text></svg>">
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <!-- Lightbox2 CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/css/lightbox.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/custom.css">
+    
+    <!-- Configuration (must load before other scripts) -->
+    <script src="js/config.js"></script>
+    <script>
+        // Update meta tags with config values
+        document.addEventListener('DOMContentLoaded', function() {
+            if (window.SITE_CONFIG) {
+                const baseUrl = SITE_CONFIG.urls.base;
+                const contact = SITE_CONFIG.contact;
+                
+                // Update OG URLs
+                const ogUrl = document.getElementById('og-url');
+                const twitterUrl = document.getElementById('twitter-url');
+                if (ogUrl) ogUrl.content = baseUrl;
+                if (twitterUrl) twitterUrl.content = baseUrl;
+                
+                // Update structured data
+                const structuredData = document.querySelector('script[type="application/ld+json"]');
+                if (structuredData) {
+                    try {
+                        const data = JSON.parse(structuredData.textContent);
+                        data.url = baseUrl;
+                        data.telephone = contact.phone;
+                        data.email = contact.email;
+                        structuredData.textContent = JSON.stringify(data);
+                    } catch (e) {
+                        console.error('Error updating structured data:', e);
+                    }
+                }
+            }
+        });
+    </script>
+</head>
+<body>
+    <!-- Skip to content link for accessibility -->
+    <a class="visually-hidden-focusable btn btn-primary position-absolute top-0 start-0 m-2" href="#main-content" style="z-index: 9999;">Skip to main content</a>
+    
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white fixed-top shadow-sm">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="index.html">WBS New Vision</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="index.html">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="portfolio.html">Portfolio</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="about.html">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="services.html">Services</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <main id="main-content">
+    <section class="hero-section">
+        <div class="container">
+            <div class="row align-items-center min-vh-100 py-5">
+                <div class="col-lg-6">
+                    <h1 class="display-4 fw-bold mb-4">WBS New Vision</h1>
+                    <p class="lead mb-4">Capturing life's beautiful moments through professional photography. Specializing in portraits, events, nature, and commercial photography.</p>
+                    <a href="portfolio.html" class="btn btn-primary btn-lg">View Portfolio</a>
+                </div>
+                <div class="col-lg-6">
+                    <div class="hero-image-placeholder">
+                        <div class="ratio ratio-16x9 rounded overflow-hidden shadow">
+                            <img src="https://picsum.photos/id/1005/1200/675" 
+                                 alt="WBS New Vision Photography" 
+                                 class="img-fluid"
+                                 style="object-fit: cover; width: 100%; height: 100%;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Gallery Preview -->
+    <section class="py-5 bg-light">
+        <div class="container">
+            <div class="row mb-4">
+                <div class="col-12 text-center">
+                    <h2 class="display-5 fw-bold mb-3">Featured Work</h2>
+                    <p class="lead text-muted">A glimpse of our photography portfolio</p>
+                </div>
+            </div>
+            <div class="row g-4" id="featured-gallery">
+                <!-- Featured images will be loaded here via JavaScript -->
+            </div>
+            <div class="row mt-4">
+                <div class="col-12 text-center">
+                    <a href="portfolio.html" class="btn btn-outline-primary btn-lg">View Full Portfolio</a>
+                </div>
+            </div>
+        </div>
+    </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-light py-5 mt-5">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <h5 class="fw-bold mb-3">WBS New Vision</h5>
+                    <p class="text-muted mb-0">Professional Photography Services</p>
+                    <p class="text-muted mb-0">Capturing life's beautiful moments</p>
+                </div>
+                <div class="col-md-4">
+                    <h5 class="fw-bold mb-3">Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="index.html" class="text-muted text-decoration-none">Home</a></li>
+                        <li><a href="portfolio.html" class="text-muted text-decoration-none">Portfolio</a></li>
+                        <li><a href="about.html" class="text-muted text-decoration-none">About</a></li>
+                        <li><a href="services.html" class="text-muted text-decoration-none">Services</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h5 class="fw-bold mb-3">Contact</h5>
+                    <p class="text-muted mb-1">
+                        <i class="bi bi-envelope me-2"></i><span data-contact="email">contact@wbsnewvision.com</span>
+                    </p>
+                    <p class="text-muted mb-0">
+                        <i class="bi bi-telephone me-2"></i><span data-contact="phone">(555) 123-4567</span>
+                    </p>
+                </div>
+            </div>
+            <hr class="my-4 bg-secondary">
+            <div class="row">
+                <div class="col-12 text-center">
+                    <p class="text-muted mb-0">&copy; <span data-year="current">2024</span> <span data-site="name">WBS New Vision</span>. All rights reserved.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Lightbox2 JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/js/lightbox.min.js"></script>
+    <!-- Custom JS -->
+    <script src="js/utils.js"></script>
+    <script src="js/main.js"></script>
+    
+    <!-- Structured Data for SEO -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "ProfessionalService",
+      "name": "WBS New Vision",
+      "description": "Professional Photography Services specializing in portraits, events, nature, and commercial photography",
+      "url": "",
+      "logo": "https://wbsnewvision.github.io",
+      "image": "https://picsum.photos/id/1005/1200/630",
+      "telephone": "",
+      "email": "",
+      "address": {
+        "@type": "PostalAddress",
+        "addressCountry": "US"
+      },
+      "areaServed": {
+        "@type": "Country",
+        "name": "United States"
+      },
+      "serviceType": "Photography Services",
+      "hasOfferCatalog": {
+        "@type": "OfferCatalog",
+        "name": "Photography Services",
+        "itemListElement": [
+          {
+            "@type": "Offer",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "Portrait Photography",
+              "description": "Professional portrait photography for individuals, families, and groups"
+            }
+          },
+          {
+            "@type": "Offer",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "Event Photography",
+              "description": "Comprehensive coverage of weddings, corporate events, and special occasions"
+            }
+          },
+          {
+            "@type": "Offer",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "Nature Photography",
+              "description": "Stunning landscapes, wildlife, and nature scenes"
+            }
+          },
+          {
+            "@type": "Offer",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "Commercial Photography",
+              "description": "Professional product photography, headshots, and business imagery"
+            }
+          }
+        ]
+      }
+    }
+    </script>
+</body>
+</html>
