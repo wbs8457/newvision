@@ -134,8 +134,6 @@
     <!-- Custom JS -->
     <script src="js/utils.js"></script>
     <script src="js/main.js"></script>
-    <!-- Lightbox2 JS - Load after main.js so gallery items are created first -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/js/lightbox.min.js"></script>
     <script>
         // Initialize gallery when page loads
         document.addEventListener('DOMContentLoaded', async function() {
@@ -144,9 +142,11 @@
                     // Load gallery first (creates DOM elements with data-lightbox attributes)
                     await loadGallery();
                     
-                    // Configure Lightbox options after gallery is loaded
-                    // Lightbox2 auto-binds to elements with data-lightbox, so we just configure options
-                    setTimeout(() => {
+                    // Load Lightbox2 AFTER gallery items are created
+                    const lightboxScript = document.createElement('script');
+                    lightboxScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/js/lightbox.min.js';
+                    lightboxScript.onload = function() {
+                        // Configure Lightbox options after it loads
                         if (typeof lightbox !== 'undefined' && typeof lightbox.option === 'function') {
                             try {
                                 if (window.SITE_CONFIG?.lightbox) {
@@ -156,7 +156,8 @@
                                 console.error('Lightbox configuration error:', error);
                             }
                         }
-                    }, 100);
+                    };
+                    document.head.appendChild(lightboxScript);
                 } catch (error) {
                     console.error('Error loading gallery:', error);
                 }
