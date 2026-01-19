@@ -73,88 +73,133 @@ async function saveGalleriesToR2(galleries) {
     return { success: true, method: 'download', message: 'File downloaded. Upload to R2 bucket at data/galleries.json' };
 }
 
-// Show gallery manager modal
-async function showGalleryManager() {
+// Load and render galleries in the tab
+async function loadAndRenderGalleries() {
     currentGalleries = await loadGalleriesForManagement();
     renderGalleriesList();
-    const modal = new bootstrap.Modal(document.getElementById('galleryManagerModal'));
+}
+
+// Open modal to add new gallery
+function openAddGalleryModal() {
+    document.getElementById('galleryEditModalTitle').textContent = 'Add New Gallery';
+    document.getElementById('editGalleryIndex').value = '';
+    document.getElementById('editGalleryId').value = '';
+    document.getElementById('editGalleryName').value = '';
+    document.getElementById('editGalleryDescription').value = '';
+    const modal = new bootstrap.Modal(document.getElementById('galleryEditModal'));
     modal.show();
+}
+
+// Open modal to edit existing gallery
+function openEditGalleryModal(index) {
+    const gallery = currentGalleries[index];
+    if (!gallery) return;
+    
+    document.getElementById('galleryEditModalTitle').textContent = 'Edit Gallery';
+    document.getElementById('editGalleryIndex').value = index;
+    document.getElementById('editGalleryId').value = gallery.id || '';
+    document.getElementById('editGalleryName').value = gallery.name || '';
+    document.getElementById('editGalleryDescription').value = gallery.description || '';
+    const modal = new bootstrap.Modal(document.getElementById('galleryEditModal'));
+    modal.show();
+}
+
+// Save gallery from modal form
+function saveGalleryFromModal() {
+    const index = document.getElementById('editGalleryIndex').value;
+    const id = document.getElementById('editGalleryId').value.trim().toLowerCase();
+    const name = document.getElementById('editGalleryName').value.trim();
+    const description = document.getElementById('editGalleryDescription').value.trim();
+    
+    if (!id || !name) {
+        alert('Please fill in Gallery ID and Name');
+        return;
+    }
+    
+    // Validate ID format
+    if (!/^[a-z0-9-]+$/.test(id)) {
+        alert('Gallery ID can only contain lowercase letters, numbers, and hyphens');
+        return;
+    }
+    
+    // Check for duplicate IDs (excluding current gallery)
+    const existingIndex = currentGalleries.findIndex((g, i) => 
+        g.id.toLowerCase() === id.toLowerCase() && i !== parseInt(index)
+    );
+    if (existingIndex >= 0) {
+        alert('A gallery with this ID already exists');
+        return;
+    }
+    
+    const galleryData = {
+        id: id,
+        name: name,
+        description: description
+    };
+    
+    if (index === '' || index === null) {
+        // Add new gallery
+        currentGalleries.push(galleryData);
+    } else {
+        // Update existing gallery
+        currentGalleries[parseInt(index)] = galleryData;
+    }
+    
+    renderGalleriesList();
+    
+    // Close modal
+    const modal = bootstrap.Modal.getInstance(document.getElementById('galleryEditModal'));
+    if (modal) modal.hide();
 }
 
 // Render galleries list
 function renderGalleriesList() {
     const listDiv = document.getElementById('galleriesList');
-    listDiv.innerHTML = '';
+    if (!listDiv) return;
     
     if (currentGalleries.length === 0) {
-        listDiv.innerHTML = '<p class="text-muted">No galleries yet. Click "Add New Gallery" to create one.</p>';
+        listDiv.innerHTML = '<p class="text-muted text-center py-4">No galleries yet. Click "Add New Gallery" to create one.</p>';
         return;
     }
     
-    currentGalleries.forEach((gallery, index) => {
-        const galleryDiv = document.createElement('div');
-        galleryDiv.className = 'card mb-3';
-        galleryDiv.innerHTML = `
+    listDiv.innerHTML = currentGalleries.map((gallery, index) => `
+        <div class="card mb-3">
             <div class="card-body">
-                <div class="row">
-                    <div class="col-md-4">
-                        <label class="form-label small">Gallery ID</label>
-                        <input type="text" class="form-control form-control-sm" value="${gallery.id}" 
-                               onchange="updateGallery(${index}, 'id', this.value)" 
-                               placeholder="e.g., portraits">
+                <div class="row align-items-center">
+                    <div class="col-md-3">
+                        <strong>ID:</strong><br>
+                        <code>${gallery.id || 'N/A'}</code>
                     </div>
-                    <div class="col-md-5">
-                        <label class="form-label small">Gallery Name</label>
-                        <input type="text" class="form-control form-control-sm" value="${gallery.name || ''}" 
-                               onchange="updateGallery(${index}, 'name', this.value)" 
-                               placeholder="e.g., Portraits">
+                    <div class="col-md-4">
+                        <strong>Name:</strong><br>
+                        ${gallery.name || 'N/A'}
                     </div>
                     <div class="col-md-3">
-                        <label class="form-label small">&nbsp;</label>
-                        <button class="btn btn-danger btn-sm w-100" onclick="removeGallery(${index})">
-                            <i class="bi bi-trash me-1"></i>Remove
+                        <strong>Description:</strong><br>
+                        <small class="text-muted">${gallery.description || 'None'}</small>
+                    </div>
+                    <div class="col-md-2 text-end">
+                        <button class="btn btn-sm btn-outline-primary me-1" onclick="openEditGalleryModal(${index})">
+                            <i class="bi bi-pencil"></i> Edit
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger" onclick="removeGallery(${index})">
+                            <i class="bi bi-trash"></i>
                         </button>
                     </div>
                 </div>
-                <div class="row mt-2">
-                    <div class="col-12">
-                        <label class="form-label small">Description</label>
-                        <input type="text" class="form-control form-control-sm" value="${gallery.description || ''}" 
-                               onchange="updateGallery(${index}, 'description', this.value)" 
-                               placeholder="Optional description">
-                    </div>
-                </div>
             </div>
-        `;
-        listDiv.appendChild(galleryDiv);
-    });
-}
-
-// Add new gallery
-function addNewGallery() {
-    const newGallery = {
-        id: '',
-        name: '',
-        description: ''
-    };
-    currentGalleries.push(newGallery);
-    renderGalleriesList();
-}
-
-// Update gallery property
-function updateGallery(index, property, value) {
-    if (currentGalleries[index]) {
-        currentGalleries[index][property] = value;
-    }
+        </div>
+    `).join('');
 }
 
 // Remove gallery
 function removeGallery(index) {
-    if (confirm('Are you sure you want to remove this gallery?')) {
+    if (confirm('Are you sure you want to remove this gallery? Images assigned to this gallery will need to be reassigned.')) {
         currentGalleries.splice(index, 1);
         renderGalleriesList();
     }
 }
+
 
 // Upload default galleries to R2
 async function uploadDefaultGalleries() {
@@ -203,12 +248,9 @@ async function uploadDefaultGalleries() {
             alert('✅ Successfully uploaded default galleries.json to R2!');
             // Reload galleries
             await populateGalleryDropdown();
-            if (typeof loadGalleriesForManagement === 'function') {
-                // Refresh gallery manager if open
-                const modal = bootstrap.Modal.getInstance(document.getElementById('galleryManagerModal'));
-                if (modal && modal._isShown) {
-                    await showGalleryManager();
-                }
+            // Refresh galleries list if on the galleries tab
+            if (typeof loadAndRenderGalleries === 'function') {
+                await loadAndRenderGalleries();
             }
         } else {
             alert('❌ Upload failed: ' + (result.error || 'Unknown error'));
@@ -242,10 +284,13 @@ async function saveGalleries() {
     
     if (result.success) {
         if (result.method === 'r2') {
-            alert('Galleries saved successfully to R2!');
+            alert('✅ Galleries saved successfully to R2!');
             // Reload dropdown
-            await populateGalleryDropdown();
-            bootstrap.Modal.getInstance(document.getElementById('galleryManagerModal')).hide();
+            if (typeof populateGalleryDropdown === 'function') {
+                await populateGalleryDropdown();
+            }
+            // Reload galleries list
+            await loadAndRenderGalleries();
         } else {
             alert('Galleries file downloaded. Please upload it to your R2 bucket at data/galleries.json, then refresh the page.');
         }
