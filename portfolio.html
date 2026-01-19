@@ -141,37 +141,22 @@
         document.addEventListener('DOMContentLoaded', async function() {
             if (typeof loadGallery === 'function') {
                 try {
-                    // Load gallery first, then configure Lightbox after items are created
+                    // Load gallery first (creates DOM elements with data-lightbox attributes)
                     await loadGallery();
                     
-                    // Wait for Lightbox to be available and configure it
-                    function configureLightbox() {
+                    // Configure Lightbox options after gallery is loaded
+                    // Lightbox2 auto-binds to elements with data-lightbox, so we just configure options
+                    setTimeout(() => {
                         if (typeof lightbox !== 'undefined' && typeof lightbox.option === 'function') {
                             try {
                                 if (window.SITE_CONFIG?.lightbox) {
                                     lightbox.option(window.SITE_CONFIG.lightbox);
                                 }
-                                return true;
                             } catch (error) {
                                 console.error('Lightbox configuration error:', error);
-                                return false;
                             }
                         }
-                        return false;
-                    }
-                    
-                    // Try to configure immediately
-                    if (!configureLightbox()) {
-                        // Wait for Lightbox script to load
-                        const checkInterval = setInterval(() => {
-                            if (configureLightbox()) {
-                                clearInterval(checkInterval);
-                            }
-                        }, 50);
-                        
-                        // Give up after 2 seconds
-                        setTimeout(() => clearInterval(checkInterval), 2000);
-                    }
+                    }, 100);
                 } catch (error) {
                     console.error('Error loading gallery:', error);
                 }

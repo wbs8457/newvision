@@ -159,7 +159,9 @@ async function loadGallery() {
     // Initialize gallery filter
     await initializeGalleryFilter();
     
-    // Wait a bit for DOM to update, then configure Lightbox
+    // Lightbox2 will auto-bind to new elements with data-lightbox attribute
+    // No manual initialization needed - it handles dynamic content automatically
+    
     return Promise.resolve();
 }
 
