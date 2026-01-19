@@ -137,11 +137,18 @@
     <script src="js/utils.js"></script>
     <script src="js/main.js"></script>
     <script>
-        // Initialize gallery when page loads
+        // Initialize gallery when page loads (after Lightbox is ready)
         document.addEventListener('DOMContentLoaded', function() {
-            if (typeof loadGallery === 'function') {
-                loadGallery();
+            // Wait for Lightbox to be available
+            function initGallery() {
+                if (typeof lightbox !== 'undefined' && typeof loadGallery === 'function') {
+                    loadGallery();
+                } else {
+                    // Retry after a short delay
+                    setTimeout(initGallery, 100);
+                }
             }
+            initGallery();
         });
     </script>
 </body>

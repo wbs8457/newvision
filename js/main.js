@@ -9,10 +9,34 @@ const CONFIG = {
     USE_PLACEHOLDERS: window.SITE_CONFIG?.r2?.usePlaceholders !== false,
 };
 
-// Initialize Lightbox2
-if (typeof lightbox !== 'undefined' && window.SITE_CONFIG?.lightbox) {
-    lightbox.option(window.SITE_CONFIG.lightbox);
+// Initialize Lightbox2 (wait for it to be available)
+function initializeLightbox() {
+    if (typeof lightbox !== 'undefined' && lightbox.option) {
+        try {
+            if (window.SITE_CONFIG?.lightbox) {
+                lightbox.option(window.SITE_CONFIG.lightbox);
+            }
+            return true;
+        } catch (error) {
+            console.error('Lightbox initialization error:', error);
+            return false;
+        }
+    }
+    return false;
 }
+
+// Try to initialize after DOM and Lightbox are ready
+document.addEventListener('DOMContentLoaded', function() {
+    // Wait for Lightbox to load
+    const checkLightbox = setInterval(() => {
+        if (initializeLightbox()) {
+            clearInterval(checkLightbox);
+        }
+    }, 100);
+    
+    // Give up after 5 seconds
+    setTimeout(() => clearInterval(checkLightbox), 5000);
+});
 
 // Load gallery data
 async function loadGalleryData() {
@@ -31,8 +55,8 @@ async function loadGalleryData() {
 
 // Get image URL from R2 or use placeholder
 function getImageUrl(filename, size = 'gallery', imageIndex = 0) {
-    // If R2 is not configured, use placeholder images
-    if (!CONFIG.R2_BASE_URL || CONFIG.R2_BASE_URL.includes('your-account-id') || CONFIG.USE_PLACEHOLDERS) {
+    // If R2 is not configured or placeholders are enabled, use placeholder images
+    if (!CONFIG.R2_BASE_URL || CONFIG.R2_BASE_URL.includes('your-account-id') || CONFIG.USE_PLACEHOLDERS === true) {
         // Use Picsum Photos for beautiful placeholder images
         // Different sizes for different use cases
         const sizeMap = {
@@ -271,6 +295,9 @@ async function loadFeaturedImages() {
         `;
         featuredGallery.insertAdjacentHTML('beforeend', itemHTML);
     });
+    
+    // Lightbox2 automatically binds to elements with data-lightbox attribute
+    // No need to reinitialize - it handles dynamic content automatically
 }
 
 // Initialize on page load
