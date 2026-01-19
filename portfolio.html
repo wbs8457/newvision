@@ -134,8 +134,6 @@
     <!-- Custom JS -->
     <script src="js/utils.js"></script>
     <script src="js/main.js"></script>
-    <!-- Lightbox2 JS - Load after custom scripts, with defer to ensure DOM is ready -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/js/lightbox.min.js" defer></script>
     <script>
         // Initialize gallery when page loads
         document.addEventListener('DOMContentLoaded', async function() {
@@ -144,32 +142,35 @@
                     // Load gallery first (creates DOM elements with data-lightbox attributes)
                     await loadGallery();
                     
-                    // Wait for Lightbox2 to load and DOM to update
-                    function configureLightbox() {
-                        if (typeof lightbox !== 'undefined') {
-                            try {
-                                // Configure Lightbox options
-                                if (typeof lightbox.option === 'function' && window.SITE_CONFIG?.lightbox) {
-                                    lightbox.option(window.SITE_CONFIG.lightbox);
-                                }
-                                return true;
-                            } catch (error) {
-                                console.error('Lightbox configuration error:', error);
-                                return false;
-                            }
-                        }
-                        return false;
-                    }
+                    // Wait for DOM to fully update
+                    await new Promise(resolve => setTimeout(resolve, 300));
                     
-                    // Wait for Lightbox2 to be available (it loads with defer)
-                    const maxAttempts = 50;
-                    let attempts = 0;
-                    const checkLightbox = setInterval(() => {
-                        attempts++;
-                        if (configureLightbox() || attempts >= maxAttempts) {
-                            clearInterval(checkLightbox);
-                        }
-                    }, 100);
+                    // Now load Lightbox2 AFTER gallery items exist
+                    const lightboxScript = document.createElement('script');
+                    lightboxScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/js/lightbox.min.js';
+                    lightboxScript.onload = function() {
+                        // Wait a moment for Lightbox2 to fully initialize
+                        setTimeout(() => {
+                            if (typeof lightbox !== 'undefined') {
+                                try {
+                                    // Configure Lightbox options
+                                    if (typeof lightbox.option === 'function' && window.SITE_CONFIG?.lightbox) {
+                                        lightbox.option(window.SITE_CONFIG.lightbox);
+                                    }
+                                    // Manually start Lightbox to bind to existing elements
+                                    if (typeof lightbox.start === 'function') {
+                                        lightbox.start();
+                                    }
+                                } catch (error) {
+                                    console.error('Lightbox configuration error:', error);
+                                }
+                            }
+                        }, 100);
+                    };
+                    lightboxScript.onerror = function() {
+                        console.error('Failed to load Lightbox2 script');
+                    };
+                    document.head.appendChild(lightboxScript);
                 } catch (error) {
                     console.error('Error loading gallery:', error);
                 }
