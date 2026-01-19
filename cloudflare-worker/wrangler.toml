@@ -1,0 +1,20 @@
+# Cloudflare Workers configuration for R2 upload
+# Run: npx wrangler deploy
+
+name = "r2-upload-worker"
+main = "upload.js"
+compatibility_date = "2024-01-01"
+
+# R2 bucket binding
+# Create in Cloudflare Dashboard > Workers > Your Worker > Settings > Variables > R2 Bucket Bindings
+[[r2_buckets]]
+binding = "R2_BUCKET"
+bucket_name = "newvision"
+
+# Environment variables (set in Cloudflare Dashboard)
+# These should be set in the Cloudflare Dashboard, not here (for security)
+# ACCOUNT_ID = "a4a6684b586aeee5dafd01cdd8492644"
+# BUCKET_NAME = "newvision"
+
+# Routes (optional - can use workers.dev default)
+# routes = []

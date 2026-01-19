@@ -5,6 +5,9 @@ tokens.local.js
 .env.local
 .env.*.local
 
+# Generated configs from secrets (optional - uncomment if you want to ignore it)
+# js/config-secrets.js
+
 # OS files
 .DS_Store
 Thumbs.db

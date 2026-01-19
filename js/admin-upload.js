@@ -9,19 +9,15 @@ const R2_CONFIG = {
         thumbnails: 400,
         gallery: 800,
         full: 1200
-    }
+    },
+    // Cloudflare Worker URL for secure uploads
+    // Set this to your deployed Worker URL after deploying cloudflare-worker/upload.js
+    // Format: https://your-worker.your-subdomain.workers.dev
+    // This can also be set via GitHub Secrets (see DEPLOYMENT.md)
+    workerUrl: (typeof window !== 'undefined' && window.SECRETS_CONFIG?.workerUrl) 
+        ? window.SECRETS_CONFIG.workerUrl 
+        : null // Set this manually or via GitHub Secrets
 };
-
-// Get R2 credentials from local tokens
-function getR2Credentials() {
-    if (!window.LOCAL_TOKENS || !window.LOCAL_TOKENS.cloudflareR2Token) {
-        throw new Error('R2 token not found. Please check tokens.local.js');
-    }
-    return {
-        accessKeyId: window.LOCAL_TOKENS.cloudflareR2Token.split('_')[0] || '',
-        secretAccessKey: window.LOCAL_TOKENS.cloudflareR2Token
-    };
-}
 
 // Image resizing function
 function resizeImage(file, maxWidth, quality = 0.9) {
@@ -76,81 +72,38 @@ async function generateImageSizes(file) {
     return { thumbnail, gallery, full };
 }
 
-// AWS Signature V4 for R2 upload
-function createR2Signature(method, url, headers, payload, accessKey, secretKey, region = 'auto') {
-    // AWS Signature V4 implementation for R2
-    // This is a simplified version - for production, consider using AWS SDK
-    
-    const crypto = window.crypto || window.msCrypto;
-    if (!crypto || !crypto.subtle) {
-        throw new Error('Web Crypto API not available');
-    }
-    
-    // Parse URL
-    const urlObj = new URL(url);
-    const host = urlObj.hostname;
-    const path = urlObj.pathname;
-    
-    // Create canonical request
-    const canonicalUri = path;
-    const canonicalQueryString = '';
-    const canonicalHeaders = Object.keys(headers)
-        .sort()
-        .map(key => `${key.toLowerCase()}:${headers[key]}\n`)
-        .join('');
-    const signedHeaders = Object.keys(headers)
-        .sort()
-        .map(key => key.toLowerCase())
-        .join(';');
-    
-    // For now, use a simpler approach with R2 API tokens
-    // R2 supports S3-compatible API, but requires proper credentials
-    return null; // Will use alternative method
-}
-
-// Upload to R2 using S3-compatible API
+// Upload to R2 via Cloudflare Worker (secure server-side upload)
 async function uploadToR2(blob, key, contentType) {
-    // R2 uses S3-compatible API but requires AWS Signature V4
-    // For client-side uploads, we'll use a workaround:
-    // 1. Try direct upload with API token (if supported)
-    // 2. Fall back to providing download links for manual upload
+    // Use Cloudflare Worker for secure server-side uploads
+    // Worker handles authentication and AWS Signature V4 signing
     
-    const url = `https://${R2_CONFIG.accountId}.r2.cloudflarestorage.com/${R2_CONFIG.bucketName}/${key}`;
-    
-    // Check if we have R2 API token format
-    const token = window.LOCAL_TOKENS?.cloudflareR2Token;
-    if (!token) {
-        throw new Error('R2 token not found');
+    if (!R2_CONFIG.workerUrl) {
+        throw new Error('Worker URL not configured. Please set R2_CONFIG.workerUrl in admin-upload.js after deploying the Cloudflare Worker.');
     }
     
     try {
-        // R2 may support direct uploads with API token in some configurations
-        // Try with standard R2 API token format
-        const response = await fetch(url, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': contentType,
-                'Authorization': `Bearer ${token}`,
-                // R2 specific headers
-                'X-R2-Prefix': '',
-            },
-            body: blob
+        // Create form data to send to Worker
+        const formData = new FormData();
+        formData.append('image', blob, key.split('/').pop());
+        formData.append('key', key);
+        formData.append('contentType', contentType);
+        
+        // Send to Cloudflare Worker
+        const response = await fetch(R2_CONFIG.workerUrl, {
+            method: 'POST',
+            body: formData
         });
-
+        
         if (!response.ok) {
-            // If direct upload fails, return download URL for manual upload
-            throw new Error(`Direct upload not supported. Please upload manually.`);
+            const error = await response.json().catch(() => ({ error: response.statusText }));
+            throw new Error(error.error || `Upload failed: ${response.status}`);
         }
-
-        return true;
+        
+        const result = await response.json();
+        return result.success;
     } catch (error) {
-        // Return the blob URL for manual download/upload
-        throw {
-            message: 'Direct upload requires AWS Signature V4. Use manual upload option.',
-            blob: blob,
-            key: key,
-            contentType: contentType
-        };
+        console.error('Upload error:', error);
+        throw new Error(error.message || 'Upload failed. Please check your Worker URL and configuration.');
     }
 }
 
