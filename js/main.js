@@ -147,7 +147,8 @@ async function loadGalleriesForFilter() {
         try {
             const response = await fetch(`${workerUrl}?path=data/galleries.json`);
             if (response.ok) {
-                const data = await response.json();
+                const text = await response.text();
+                const data = JSON.parse(text);
                 return data.galleries || [];
             }
         } catch (error) {
