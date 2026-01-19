@@ -9,34 +9,8 @@ const CONFIG = {
     USE_PLACEHOLDERS: window.SITE_CONFIG?.r2?.usePlaceholders !== false,
 };
 
-// Initialize Lightbox2 (wait for it to be available)
-function initializeLightbox() {
-    if (typeof lightbox !== 'undefined' && lightbox.option) {
-        try {
-            if (window.SITE_CONFIG?.lightbox) {
-                lightbox.option(window.SITE_CONFIG.lightbox);
-            }
-            return true;
-        } catch (error) {
-            console.error('Lightbox initialization error:', error);
-            return false;
-        }
-    }
-    return false;
-}
-
-// Try to initialize after DOM and Lightbox are ready
-document.addEventListener('DOMContentLoaded', function() {
-    // Wait for Lightbox to load
-    const checkLightbox = setInterval(() => {
-        if (initializeLightbox()) {
-            clearInterval(checkLightbox);
-        }
-    }, 100);
-    
-    // Give up after 5 seconds
-    setTimeout(() => clearInterval(checkLightbox), 5000);
-});
+// Lightbox2 auto-binds to elements with data-lightbox attribute
+// Configuration is handled in portfolio.html after gallery loads
 
 // Load gallery data from R2 via Worker or local file
 async function loadGalleryData() {
@@ -135,6 +109,7 @@ function createGalleryItem(image, index) {
 
 // Load and display gallery
 async function loadGallery() {
+    return new Promise(async (resolve) => {
     const galleryGrid = document.getElementById('gallery-grid');
     if (!galleryGrid) return;
     
@@ -184,6 +159,10 @@ async function loadGallery() {
     
     // Initialize gallery filter
     initializeGalleryFilter();
+    
+    // Resolve promise to indicate gallery is loaded
+    resolve();
+    });
 }
 
 // Load galleries and create filter buttons

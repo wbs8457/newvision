@@ -131,24 +131,30 @@
 
     <!-- Bootstrap 5 JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Lightbox2 JS -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/js/lightbox.min.js"></script>
     <!-- Custom JS -->
     <script src="js/utils.js"></script>
     <script src="js/main.js"></script>
+    <!-- Lightbox2 JS - Load after main.js so gallery items are created first -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/js/lightbox.min.js"></script>
     <script>
-        // Initialize gallery when page loads (after Lightbox is ready)
+        // Initialize gallery when page loads
         document.addEventListener('DOMContentLoaded', function() {
-            // Wait for Lightbox to be available
-            function initGallery() {
-                if (typeof lightbox !== 'undefined' && typeof loadGallery === 'function') {
-                    loadGallery();
-                } else {
-                    // Retry after a short delay
-                    setTimeout(initGallery, 100);
-                }
+            if (typeof loadGallery === 'function') {
+                // Load gallery first, then configure Lightbox after items are created
+                loadGallery().then(() => {
+                    // Configure Lightbox options after gallery is loaded
+                    if (typeof lightbox !== 'undefined' && typeof lightbox.option === 'function' && window.SITE_CONFIG?.lightbox) {
+                        lightbox.option(window.SITE_CONFIG.lightbox);
+                    }
+                }).catch(() => {
+                    // If loadGallery doesn't return a promise, configure Lightbox anyway
+                    setTimeout(() => {
+                        if (typeof lightbox !== 'undefined' && typeof lightbox.option === 'function' && window.SITE_CONFIG?.lightbox) {
+                            lightbox.option(window.SITE_CONFIG.lightbox);
+                        }
+                    }, 500);
+                });
             }
-            initGallery();
         });
     </script>
 </body>
