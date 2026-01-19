@@ -242,8 +242,22 @@ function updatePreviews() {
 
 // Update upload button state
 function updateUploadButton() {
-    const gallery = document.getElementById('gallery').value;
+    const gallerySelect = document.getElementById('gallery');
+    if (!gallerySelect) {
+        uploadBtn.disabled = true;
+        return;
+    }
+    const gallery = gallerySelect.value;
     uploadBtn.disabled = selectedImages.length === 0 || !gallery;
+    
+    // Debug log
+    if (selectedImages.length > 0 && !gallery) {
+        console.log('Upload button disabled: Gallery not selected');
+    } else if (selectedImages.length === 0) {
+        console.log('Upload button disabled: No images selected');
+    } else {
+        console.log('Upload button enabled');
+    }
 }
 
 // Initialize on page load
@@ -288,6 +302,11 @@ async function loadGalleries() {
 // Populate gallery dropdown
 async function populateGalleryDropdown() {
     const gallerySelect = document.getElementById('gallery');
+    if (!gallerySelect) {
+        console.error('Gallery select element not found');
+        return;
+    }
+    
     const galleries = await loadGalleries();
     
     gallerySelect.innerHTML = '<option value="">Select a gallery...</option>';
@@ -298,7 +317,12 @@ async function populateGalleryDropdown() {
         gallerySelect.appendChild(option);
     });
     
+    // Update button state after populating
     updateUploadButton();
+    
+    // Ensure change event is attached
+    gallerySelect.removeEventListener('change', updateUploadButton);
+    gallerySelect.addEventListener('change', updateUploadButton);
 }
 
 // Handle upload

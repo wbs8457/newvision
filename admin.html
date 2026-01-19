@@ -368,17 +368,23 @@
         // Update checkPassword to initialize galleries after auth
         const originalCheckPassword = window.checkPassword;
         window.checkPassword = async function() {
-            await originalCheckPassword();
+            const result = await originalCheckPassword();
             // After successful auth, initialize galleries
-            setTimeout(() => {
-                if (typeof populateGalleryDropdown === 'function') {
-                    populateGalleryDropdown();
-                    const gallerySelect = document.getElementById('gallery');
-                    if (gallerySelect) {
-                        gallerySelect.addEventListener('change', updateUploadButton);
+            if (result) {
+                setTimeout(async () => {
+                    if (typeof populateGalleryDropdown === 'function') {
+                        await populateGalleryDropdown();
+                        const gallerySelect = document.getElementById('gallery');
+                        if (gallerySelect) {
+                            gallerySelect.addEventListener('change', updateUploadButton);
+                        }
+                        // Update button state after galleries load
+                        if (typeof updateUploadButton === 'function') {
+                            updateUploadButton();
+                        }
                     }
-                }
-            }, 100);
+                }, 200);
+            }
         };
     </script>
 </body>
