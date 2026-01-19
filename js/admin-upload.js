@@ -252,20 +252,19 @@ document.addEventListener('DOMContentLoaded', async function() {
     document.getElementById('gallery').addEventListener('change', updateUploadButton);
 });
 
-// Load galleries from R2 or local file
+// Load galleries from R2 via Worker or local file
 async function loadGalleries() {
-    // Try R2 first
-    const r2BaseUrl = window.SITE_CONFIG?.r2?.baseUrl;
-    if (r2BaseUrl) {
+    // Try R2 via Worker first (avoids CORS issues)
+    const workerUrl = R2_CONFIG.workerUrl;
+    if (workerUrl) {
         try {
-            const r2Url = `${r2BaseUrl}/data/galleries.json`;
-            const response = await fetch(r2Url);
+            const response = await fetch(`${workerUrl}?path=data/galleries.json`);
             if (response.ok) {
                 const data = await response.json();
                 return data.galleries || [];
             }
         } catch (error) {
-            console.log('R2 load failed, trying local file:', error);
+            console.log('Worker load failed, trying local file:', error);
         }
     }
     

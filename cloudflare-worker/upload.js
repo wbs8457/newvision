@@ -8,19 +8,52 @@
 
 export default {
   async fetch(request, env) {
+    const url = new URL(request.url);
+    
     // Handle CORS preflight
     if (request.method === 'OPTIONS') {
       return new Response(null, {
         headers: {
           'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Methods': 'POST, OPTIONS',
+          'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
           'Access-Control-Allow-Headers': 'Content-Type',
           'Access-Control-Max-Age': '86400',
         },
       });
     }
 
-    // Only allow POST requests
+    // Handle GET requests for reading files (galleries.json, etc.)
+    if (request.method === 'GET') {
+      const path = url.searchParams.get('path') || url.pathname.replace(/^\//, '');
+      
+      if (!path) {
+        return jsonResponse({ error: 'Missing path parameter' }, 400);
+      }
+
+      try {
+        // Read from R2
+        const object = await env.R2_BUCKET.get(path);
+        
+        if (!object) {
+          return jsonResponse({ error: 'File not found' }, 404);
+        }
+
+        const data = await object.text();
+        const contentType = object.httpMetadata?.contentType || 'application/json';
+
+        return new Response(data, {
+          headers: {
+            'Content-Type': contentType,
+            'Access-Control-Allow-Origin': '*',
+          },
+        });
+      } catch (error) {
+        console.error('Read error:', error);
+        return jsonResponse({ error: error.message || 'Failed to read file' }, 500);
+      }
+    }
+
+    // Handle POST requests for uploads
     if (request.method !== 'POST') {
       return new Response('Method not allowed', { status: 405 });
     }

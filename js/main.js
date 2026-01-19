@@ -141,18 +141,17 @@ async function loadGallery() {
 
 // Load galleries and create filter buttons
 async function loadGalleriesForFilter() {
-    // Try R2 first
-    const r2BaseUrl = window.SITE_CONFIG?.r2?.baseUrl;
-    if (r2BaseUrl) {
+    // Try R2 via Worker first (avoids CORS issues)
+    const workerUrl = window.SITE_CONFIG?.r2?.workerUrl || (typeof R2_CONFIG !== 'undefined' ? R2_CONFIG.workerUrl : null);
+    if (workerUrl) {
         try {
-            const r2Url = `${r2BaseUrl}/data/galleries.json`;
-            const response = await fetch(r2Url);
+            const response = await fetch(`${workerUrl}?path=data/galleries.json`);
             if (response.ok) {
                 const data = await response.json();
                 return data.galleries || [];
             }
         } catch (error) {
-            console.log('R2 load failed, trying local file:', error);
+            console.log('Worker load failed, trying local file:', error);
         }
     }
     
