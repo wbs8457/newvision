@@ -182,14 +182,14 @@ function editImage(index) {
     // Add modal to body
     document.body.insertAdjacentHTML('beforeend', modalHtml);
     
-    // Populate gallery dropdown
-    populateEditGalleryDropdown();
-    
-    // Set current gallery
-    const gallerySelect = document.getElementById('editGallery');
-    if (gallerySelect) {
-        gallerySelect.value = image.gallery || '';
-    }
+    // Populate gallery dropdown and then set current gallery
+    populateEditGalleryDropdown().then(() => {
+        // Set current gallery after dropdown is populated
+        const gallerySelect = document.getElementById('editGallery');
+        if (gallerySelect) {
+            gallerySelect.value = image.gallery || '';
+        }
+    });
     
     // Show modal
     const modal = new bootstrap.Modal(document.getElementById('editImageModal'));
@@ -204,6 +204,8 @@ async function populateEditGalleryDropdown() {
     const galleries = await loadGalleries();
     select.innerHTML = '<option value="">Select Gallery</option>' + 
         galleries.map(g => `<option value="${g.id}">${g.name}</option>`).join('');
+    
+    return Promise.resolve(); // Return promise so we can await it
 }
 
 // Save image edit
