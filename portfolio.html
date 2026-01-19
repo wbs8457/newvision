@@ -146,17 +146,39 @@
                     // Load gallery (creates DOM elements)
                     await loadGallery();
                     
-                    // Wait for DOM to update
-                    await new Promise(resolve => setTimeout(resolve, 100));
+                    // Wait for DOM to fully update and images to potentially load
+                    await new Promise(resolve => setTimeout(resolve, 300));
                     
-                    // Initialize GLightbox
+                    // Initialize GLightbox - it will auto-detect elements with data-glightbox
                     if (typeof GLightbox !== 'undefined') {
-                        lightboxInstance = GLightbox({
-                            selector: 'a[data-glightbox]',
-                            touchNavigation: true,
-                            loop: true,
-                            autoplayVideos: false
-                        });
+                        // Check if elements exist before initializing
+                        const lightboxElements = document.querySelectorAll('a[data-glightbox]');
+                        if (lightboxElements.length > 0) {
+                            lightboxInstance = GLightbox({
+                                selector: 'a[data-glightbox]',
+                                touchNavigation: true,
+                                loop: true,
+                                autoplayVideos: false
+                            });
+                            console.log('GLightbox initialized with', lightboxElements.length, 'elements');
+                        } else {
+                            console.warn('No GLightbox elements found, retrying...');
+                            // Retry after a bit more time
+                            setTimeout(() => {
+                                const retryElements = document.querySelectorAll('a[data-glightbox]');
+                                if (retryElements.length > 0 && typeof GLightbox !== 'undefined') {
+                                    lightboxInstance = GLightbox({
+                                        selector: 'a[data-glightbox]',
+                                        touchNavigation: true,
+                                        loop: true,
+                                        autoplayVideos: false
+                                    });
+                                    console.log('GLightbox initialized on retry with', retryElements.length, 'elements');
+                                }
+                            }, 500);
+                        }
+                    } else {
+                        console.error('GLightbox library not loaded');
                     }
                 } catch (error) {
                     console.error('Error loading gallery:', error);
