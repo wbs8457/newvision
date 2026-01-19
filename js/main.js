@@ -38,8 +38,31 @@ document.addEventListener('DOMContentLoaded', function() {
     setTimeout(() => clearInterval(checkLightbox), 5000);
 });
 
-// Load gallery data
+// Load gallery data from R2 via Worker or local file
 async function loadGalleryData() {
+    // Try to load from R2 via Worker first
+    const workerUrl = (typeof window !== 'undefined' && window.SECRETS_CONFIG?.workerUrl) 
+        ? window.SECRETS_CONFIG.workerUrl 
+        : 'https://r2-upload-worker.bill-a4a.workers.dev';
+    
+    if (workerUrl) {
+        try {
+            const workerFetchUrl = `${workerUrl}/?path=data/gallery.json`;
+            const response = await fetch(workerFetchUrl);
+            if (response.ok) {
+                const data = await response.json();
+                return data;
+            } else if (response.status === 404) {
+                console.log('gallery.json not found in R2 via Worker, falling back to local file.');
+            } else {
+                console.error('Error fetching gallery.json from Worker:', response.status, response.statusText);
+            }
+        } catch (error) {
+            console.error('Worker fetch failed for gallery.json, trying local file:', error);
+        }
+    }
+    
+    // Fallback to local file
     try {
         const response = await fetch(CONFIG.GALLERY_DATA_URL);
         if (!response.ok) {
