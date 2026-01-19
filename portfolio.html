@@ -131,40 +131,45 @@
 
     <!-- Bootstrap 5 JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Lightbox2 JS - Load before custom scripts -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/js/lightbox.min.js"></script>
     <!-- Custom JS -->
     <script src="js/utils.js"></script>
     <script src="js/main.js"></script>
+    <!-- Lightbox2 JS - Load after custom scripts, with defer to ensure DOM is ready -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/js/lightbox.min.js" defer></script>
     <script>
-        // Prevent Lightbox2 from auto-initializing until gallery is loaded
-        if (typeof lightbox !== 'undefined' && typeof lightbox.option === 'function') {
-            // Disable auto-start
-            lightbox.option({
-                'disableScrolling': true
-            });
-        }
-        
         // Initialize gallery when page loads
         document.addEventListener('DOMContentLoaded', async function() {
             if (typeof loadGallery === 'function') {
                 try {
-                    // Load gallery (creates DOM elements with data-lightbox attributes)
+                    // Load gallery first (creates DOM elements with data-lightbox attributes)
                     await loadGallery();
                     
-                    // Wait for DOM to update
-                    await new Promise(resolve => setTimeout(resolve, 200));
-                    
-                    // Configure Lightbox options after gallery is loaded
-                    if (typeof lightbox !== 'undefined' && typeof lightbox.option === 'function') {
-                        try {
-                            if (window.SITE_CONFIG?.lightbox) {
-                                lightbox.option(window.SITE_CONFIG.lightbox);
+                    // Wait for Lightbox2 to load and DOM to update
+                    function configureLightbox() {
+                        if (typeof lightbox !== 'undefined') {
+                            try {
+                                // Configure Lightbox options
+                                if (typeof lightbox.option === 'function' && window.SITE_CONFIG?.lightbox) {
+                                    lightbox.option(window.SITE_CONFIG.lightbox);
+                                }
+                                return true;
+                            } catch (error) {
+                                console.error('Lightbox configuration error:', error);
+                                return false;
                             }
-                        } catch (error) {
-                            console.error('Lightbox configuration error:', error);
                         }
+                        return false;
                     }
+                    
+                    // Wait for Lightbox2 to be available (it loads with defer)
+                    const maxAttempts = 50;
+                    let attempts = 0;
+                    const checkLightbox = setInterval(() => {
+                        attempts++;
+                        if (configureLightbox() || attempts >= maxAttempts) {
+                            clearInterval(checkLightbox);
+                        }
+                    }, 100);
                 } catch (error) {
                     console.error('Error loading gallery:', error);
                 }
