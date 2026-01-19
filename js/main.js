@@ -68,10 +68,12 @@ function createGalleryItem(image, index) {
     const imageUrl = getImageUrl(image.filename, 'gallery', index);
     const fullImageUrl = getImageUrl(image.filename, 'full', index);
     
-    const categoryClass = image.category ? `category-${image.category}` : '';
+    // Support both 'gallery' and 'category' for backward compatibility
+    const galleryId = image.gallery || image.category || 'all';
+    const galleryClass = galleryId ? `gallery-${galleryId}` : '';
     
     return `
-        <div class="col-md-6 col-lg-4 mb-4 gallery-item ${categoryClass}" data-category="${image.category || 'all'}" data-index="${index}">
+        <div class="col-md-6 col-lg-4 mb-4 gallery-item ${galleryClass}" data-gallery="${galleryId}" data-index="${index}">
             <a href="${fullImageUrl}" data-lightbox="gallery" data-title="${image.title || ''}">
                 <div class="ratio ratio-4x3">
                     <img src="${imageUrl}" 
@@ -134,26 +136,74 @@ async function loadGallery() {
         galleryGrid.insertAdjacentHTML('beforeend', itemHTML);
     });
     
-    // Initialize category filter
-    initializeCategoryFilter();
+    // Initialize gallery filter
+    initializeGalleryFilter();
 }
 
-// Initialize category filter
-function initializeCategoryFilter() {
-    const filterButtons = document.querySelectorAll('[data-category]');
+// Load galleries and create filter buttons
+async function loadGalleriesForFilter() {
+    try {
+        const galleriesUrl = window.SITE_CONFIG?.gallery?.galleriesUrl || 'data/galleries.json';
+        const response = await fetch(galleriesUrl);
+        if (!response.ok) throw new Error('Failed to load galleries');
+        const data = await response.json();
+        return data.galleries || [];
+    } catch (error) {
+        console.error('Error loading galleries:', error);
+        return [];
+    }
+}
+
+// Initialize gallery filter
+async function initializeGalleryFilter() {
+    const filterContainer = document.querySelector('.btn-group[role="group"]');
+    if (!filterContainer) return;
+    
+    // Load galleries dynamically
+    const galleries = await loadGalleriesForFilter();
+    
+    // Clear existing buttons (except "All")
+    const allButton = filterContainer.querySelector('[data-gallery="all"]');
+    filterContainer.innerHTML = '';
+    
+    // Add "All" button
+    if (allButton) {
+        filterContainer.appendChild(allButton);
+    } else {
+        const allBtn = document.createElement('button');
+        allBtn.type = 'button';
+        allBtn.className = 'btn btn-outline-primary active';
+        allBtn.setAttribute('data-gallery', 'all');
+        allBtn.textContent = 'All';
+        filterContainer.appendChild(allBtn);
+    }
+    
+    // Add gallery buttons
+    galleries.forEach(gallery => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'btn btn-outline-primary';
+        btn.setAttribute('data-gallery', gallery.id);
+        btn.textContent = gallery.name;
+        filterContainer.appendChild(btn);
+    });
+    
+    // Attach event listeners
+    const filterButtons = filterContainer.querySelectorAll('[data-gallery]');
     const galleryItems = document.querySelectorAll('.gallery-item');
     
     filterButtons.forEach(button => {
         button.addEventListener('click', function() {
-            const category = this.getAttribute('data-category');
+            const galleryId = this.getAttribute('data-gallery');
             
             // Update active button
             filterButtons.forEach(btn => btn.classList.remove('active'));
             this.classList.add('active');
             
-            // Filter gallery items
+            // Filter gallery items (support both data-gallery and data-category for backward compat)
             galleryItems.forEach(item => {
-                if (category === 'all' || item.getAttribute('data-category') === category) {
+                const itemGallery = item.getAttribute('data-gallery') || item.getAttribute('data-category');
+                if (galleryId === 'all' || itemGallery === galleryId) {
                     item.style.display = 'block';
                 } else {
                     item.style.display = 'none';

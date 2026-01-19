@@ -120,8 +120,11 @@ const uploadForm = document.getElementById('uploadForm');
 const accountId = document.getElementById('accountId');
 
 // Initialize
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     accountId.textContent = R2_CONFIG.accountId;
+    
+    // Load galleries
+    await populateGalleryDropdown();
 
     // Click to select files
     uploadZone.addEventListener('click', () => fileInput.click());
@@ -147,6 +150,9 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Form submit
     uploadForm.addEventListener('submit', handleUpload);
+    
+    // Gallery change
+    document.getElementById('gallery').addEventListener('change', updateUploadButton);
 });
 
 // Handle file selection
@@ -224,21 +230,55 @@ function updatePreviews() {
 
 // Update upload button state
 function updateUploadButton() {
-    const category = document.getElementById('category').value;
-    uploadBtn.disabled = selectedImages.length === 0 || !category;
+    const gallery = document.getElementById('gallery').value;
+    uploadBtn.disabled = selectedImages.length === 0 || !gallery;
 }
 
-document.getElementById('category').addEventListener('change', updateUploadButton);
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', async function() {
+    await populateGalleryDropdown();
+    document.getElementById('gallery').addEventListener('change', updateUploadButton);
+});
+
+// Load galleries from config
+async function loadGalleries() {
+    try {
+        const galleriesUrl = window.SITE_CONFIG?.gallery?.galleriesUrl || 'data/galleries.json';
+        const response = await fetch(galleriesUrl);
+        if (!response.ok) throw new Error('Failed to load galleries');
+        const data = await response.json();
+        return data.galleries || [];
+    } catch (error) {
+        console.error('Error loading galleries:', error);
+        return [];
+    }
+}
+
+// Populate gallery dropdown
+async function populateGalleryDropdown() {
+    const gallerySelect = document.getElementById('gallery');
+    const galleries = await loadGalleries();
+    
+    gallerySelect.innerHTML = '<option value="">Select a gallery...</option>';
+    galleries.forEach(gallery => {
+        const option = document.createElement('option');
+        option.value = gallery.id;
+        option.textContent = gallery.name;
+        gallerySelect.appendChild(option);
+    });
+    
+    updateUploadButton();
+}
 
 // Handle upload
 async function handleUpload(e) {
     e.preventDefault();
     
-    const category = document.getElementById('category').value;
+    const gallery = document.getElementById('gallery').value;
     const featured = document.getElementById('featured').checked;
     
-    if (selectedImages.length === 0 || !category) {
-        alert('Please select images and a category');
+    if (selectedImages.length === 0 || !gallery) {
+        alert('Please select images and a gallery');
         return;
     }
     
@@ -289,9 +329,9 @@ async function handleUpload(e) {
                 // Generate gallery entry
                 const entry = {
                     filename: filename,
-                    category: category,
+                    gallery: gallery, // Changed from category to gallery
                     title: baseName.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
-                    alt: `${category} photography - ${baseName.replace(/-/g, ' ')}`,
+                    alt: `${gallery} photography - ${baseName.replace(/-/g, ' ')}`,
                     description: `Uploaded ${new Date().toLocaleDateString()}`,
                     featured: featured,
                     date: new Date().toISOString().split('T')[0]

@@ -35,6 +35,7 @@ const SITE_CONFIG = {
     // Gallery Configuration
     gallery: {
         dataUrl: 'data/gallery.json',
+        galleriesUrl: 'data/galleries.json', // Customizable galleries list
         featuredCount: 6, // Number of featured images on homepage
     },
     

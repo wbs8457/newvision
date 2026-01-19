@@ -1,0 +1,24 @@
+{
+  "galleries": [
+    {
+      "id": "portraits",
+      "name": "Portraits",
+      "description": "Professional portrait photography"
+    },
+    {
+      "id": "events",
+      "name": "Events",
+      "description": "Wedding and event photography"
+    },
+    {
+      "id": "nature",
+      "name": "Nature",
+      "description": "Landscape and nature photography"
+    },
+    {
+      "id": "commercial",
+      "name": "Commercial",
+      "description": "Commercial and business photography"
+    }
+  ]
+}

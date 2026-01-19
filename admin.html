@@ -135,16 +135,13 @@
                     </div>
                     <div class="card-body">
                         <form id="uploadForm">
-                            <!-- Category Selection -->
+                            <!-- Gallery Selection -->
                             <div class="mb-3">
-                                <label for="category" class="form-label">Category</label>
-                                <select class="form-select" id="category" required>
-                                    <option value="">Select a category...</option>
-                                    <option value="portraits">Portraits</option>
-                                    <option value="events">Events</option>
-                                    <option value="nature">Nature</option>
-                                    <option value="commercial">Commercial</option>
+                                <label for="gallery" class="form-label">Gallery</label>
+                                <select class="form-select" id="gallery" required>
+                                    <option value="">Loading galleries...</option>
                                 </select>
+                                <small class="text-muted">Galleries are configured in <code>data/galleries.json</code></small>
                             </div>
 
                             <!-- Featured Toggle -->
