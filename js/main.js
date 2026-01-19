@@ -150,9 +150,11 @@ async function loadGalleriesForFilter() {
                 const text = await response.text();
                 const data = JSON.parse(text);
                 return data.galleries || [];
+            } else if (response.status === 404) {
+                // File doesn't exist in R2 yet, fall through to local file
             }
         } catch (error) {
-            console.log('Worker load failed, trying local file:', error);
+            // Silently fail and try local file
         }
     }
     

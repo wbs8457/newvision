@@ -35,7 +35,14 @@ export default {
         const object = await env.R2_BUCKET.get(path);
         
         if (!object) {
-          return jsonResponse({ error: 'File not found' }, 404);
+          // Return 404 but with CORS headers so client can handle it
+          return new Response(JSON.stringify({ error: 'File not found' }), {
+            status: 404,
+            headers: {
+              'Content-Type': 'application/json',
+              'Access-Control-Allow-Origin': '*',
+            },
+          });
         }
 
         const data = await object.text();

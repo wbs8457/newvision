@@ -263,9 +263,12 @@ async function loadGalleries() {
                 const text = await response.text();
                 const data = JSON.parse(text);
                 return data.galleries || [];
+            } else if (response.status === 404) {
+                // File doesn't exist in R2 yet, fall through to local file
+                console.log('galleries.json not found in R2, using local file');
             }
         } catch (error) {
-            console.log('Worker load failed, trying local file:', error);
+            // Silently fail and try local file
         }
     }
     
