@@ -453,6 +453,11 @@ async function handleUpload(e) {
         // Show gallery entries
         showGalleryEntries(galleryEntries);
         
+        // Auto-update gallery.json if uploads were successful
+        if (successful > 0 && galleryEntries.length > 0) {
+            await updateGalleryJson(galleryEntries);
+        }
+        
         // Reset form
         selectedImages = [];
         updatePreviews();
@@ -485,6 +490,62 @@ function showGalleryEntries(entries) {
     
     card.style.display = 'block';
     card.scrollIntoView({ behavior: 'smooth' });
+}
+
+// Update gallery.json in R2
+async function updateGalleryJson(newEntries) {
+    try {
+        // Load existing gallery.json
+        const workerUrl = R2_CONFIG.workerUrl;
+        let existingData = { images: [] };
+        
+        if (workerUrl) {
+            try {
+                const response = await fetch(`${workerUrl}?path=data/gallery.json`);
+                if (response.ok) {
+                    const text = await response.text();
+                    existingData = JSON.parse(text);
+                }
+            } catch (error) {
+                console.log('Could not load existing gallery.json, creating new one');
+            }
+        }
+        
+        // Merge new entries with existing (avoid duplicates)
+        const existingFilenames = new Set(existingData.images.map(img => img.filename));
+        newEntries.forEach(entry => {
+            if (!existingFilenames.has(entry.filename)) {
+                existingData.images.push(entry);
+            }
+        });
+        
+        // Upload updated gallery.json to R2
+        const jsonString = JSON.stringify(existingData, null, 2);
+        const blob = new Blob([jsonString], { type: 'application/json' });
+        
+        const formData = new FormData();
+        formData.append('image', blob, 'gallery.json');
+        formData.append('key', 'data/gallery.json');
+        formData.append('contentType', 'application/json');
+        
+        const response = await fetch(workerUrl, {
+            method: 'POST',
+            body: formData
+        });
+        
+        if (response.ok) {
+            const result = await response.json();
+            console.log('✅ Gallery.json updated in R2!', result);
+            return true;
+        } else {
+            const error = await response.json();
+            console.error('Failed to update gallery.json:', error);
+            return false;
+        }
+    } catch (error) {
+        console.error('Error updating gallery.json:', error);
+        return false;
+    }
 }
 
 // Copy gallery entries to clipboard
