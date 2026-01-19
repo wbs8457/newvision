@@ -16,7 +16,7 @@ const R2_CONFIG = {
     // This can also be set via GitHub Secrets (see DEPLOYMENT.md)
     workerUrl: (typeof window !== 'undefined' && window.SECRETS_CONFIG?.workerUrl) 
         ? window.SECRETS_CONFIG.workerUrl 
-        : null // Set this manually or via GitHub Secrets
+        : 'https://r2-upload-worker.bill-a4a.workers.dev'
 };
 
 // Image resizing function
