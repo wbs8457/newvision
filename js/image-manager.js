@@ -73,29 +73,37 @@ function renderImagesList(images) {
         return;
     }
     
+    // Get Worker URL for image proxying
+    const workerUrl = R2_CONFIG.workerUrl || 'https://r2-upload-worker.bill-a4a.workers.dev';
+    const baseUrl = R2_CONFIG.endpoint ? `${R2_CONFIG.endpoint}/${R2_CONFIG.bucketName || 'newvision'}` : 'https://a4a6684b586aeee5dafd01cdd8492644.r2.cloudflarestorage.com/newvision';
+    
     container.innerHTML = images.map((image, index) => {
-        const imageUrl = `${R2_CONFIG.baseUrl || 'https://a4a6684b586aeee5dafd01cdd8492644.r2.cloudflarestorage.com/newvision'}/gallery/${image.filename}`;
-        const thumbnailUrl = `${R2_CONFIG.baseUrl || 'https://a4a6684b586aeee5dafd01cdd8492644.r2.cloudflarestorage.com/newvision'}/thumbnails/${image.filename}`;
+        // Use Worker to proxy images (handles auth and CORS)
+        const thumbnailUrl = workerUrl ? `${workerUrl}/?path=thumbnails/${image.filename}` : `${baseUrl}/thumbnails/${image.filename}`;
+        
+        // Find the actual index in allImages array (not filtered array)
+        const actualIndex = allImages.findIndex(img => img.filename === image.filename && img.gallery === image.gallery);
+        const imageIndex = actualIndex >= 0 ? actualIndex : index;
         
         return `
-            <div class="col-md-6 col-lg-4" data-image-index="${index}">
+            <div class="col-md-6 col-lg-4" data-image-index="${imageIndex}">
                 <div class="card h-100">
                     <div class="position-relative">
                         <img src="${thumbnailUrl}" 
                              class="card-img-top" 
                              alt="${image.alt || image.title || ''}"
                              style="height: 200px; object-fit: cover;"
-                             onerror="this.src='https://via.placeholder.com/400x200/cccccc/666666?text=Image'">
+                             onerror="this.src='https://via.placeholder.com/400x200/cccccc/666666?text=Image+Not+Found'">
                         <span class="badge bg-primary position-absolute top-0 end-0 m-2">${image.gallery || 'uncategorized'}</span>
                     </div>
                     <div class="card-body">
                         <h6 class="card-title">${image.title || image.filename}</h6>
                         <p class="card-text small text-muted">${image.description || 'No description'}</p>
                         <div class="d-flex gap-2">
-                            <button class="btn btn-sm btn-outline-primary flex-fill" onclick="editImage(${index})">
+                            <button class="btn btn-sm btn-outline-primary flex-fill" onclick="editImage(${imageIndex})">
                                 <i class="bi bi-pencil me-1"></i>Edit
                             </button>
-                            <button class="btn btn-sm btn-outline-danger flex-fill" onclick="deleteImage(${index})">
+                            <button class="btn btn-sm btn-outline-danger flex-fill" onclick="deleteImage(${imageIndex})">
                                 <i class="bi bi-trash me-1"></i>Delete
                             </button>
                         </div>
