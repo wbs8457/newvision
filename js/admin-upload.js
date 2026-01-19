@@ -326,9 +326,15 @@ async function populateGalleryDropdown() {
     // Update button state after populating
     updateUploadButton();
     
-    // Ensure change event is attached
+    // Ensure change event is attached (remove old, add new to avoid duplicates)
+    const newHandler = () => {
+        updateUploadButton();
+    };
     gallerySelect.removeEventListener('change', updateUploadButton);
-    gallerySelect.addEventListener('change', updateUploadButton);
+    gallerySelect.addEventListener('change', newHandler);
+    
+    // Also update button state now
+    updateUploadButton();
 }
 
 // Handle upload
