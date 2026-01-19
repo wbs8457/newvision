@@ -308,6 +308,12 @@
                 if (elapsed < 3600000) { // 1 hour in milliseconds
                     document.getElementById('passwordPrompt').classList.add('hidden');
                     document.getElementById('adminContent').style.display = 'block';
+                    // Initialize galleries after showing content
+                    setTimeout(() => {
+                        if (typeof populateGalleryDropdown === 'function') {
+                            populateGalleryDropdown();
+                        }
+                    }, 100);
                     return;
                 }
             }
@@ -320,12 +326,31 @@
         // Allow Enter key to submit
         document.addEventListener('DOMContentLoaded', function() {
             checkAuth();
-            document.getElementById('adminPassword').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    checkPassword();
-                }
-            });
+            const passwordInput = document.getElementById('adminPassword');
+            if (passwordInput) {
+                passwordInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        checkPassword();
+                    }
+                });
+            }
         });
+        
+        // Update checkPassword to initialize galleries after auth
+        const originalCheckPassword = window.checkPassword;
+        window.checkPassword = async function() {
+            await originalCheckPassword();
+            // After successful auth, initialize galleries
+            setTimeout(() => {
+                if (typeof populateGalleryDropdown === 'function') {
+                    populateGalleryDropdown();
+                    const gallerySelect = document.getElementById('gallery');
+                    if (gallerySelect) {
+                        gallerySelect.addEventListener('change', updateUploadButton);
+                    }
+                }
+            }, 100);
+        };
     </script>
 </body>
 </html>

@@ -123,8 +123,14 @@ const accountId = document.getElementById('accountId');
 document.addEventListener('DOMContentLoaded', async () => {
     accountId.textContent = R2_CONFIG.accountId;
     
-    // Load galleries
-    await populateGalleryDropdown();
+    // Wait for gallery select to exist (it's in the password-protected content)
+    const gallerySelect = document.getElementById('gallery');
+    if (gallerySelect) {
+        // Load galleries
+        await populateGalleryDropdown();
+        // Gallery change
+        gallerySelect.addEventListener('change', updateUploadButton);
+    }
 
     // Click to select files
     uploadZone.addEventListener('click', () => fileInput.click());
@@ -150,10 +156,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     // Form submit
     uploadForm.addEventListener('submit', handleUpload);
-    
-    // Gallery change
-    document.getElementById('gallery').addEventListener('change', updateUploadButton);
 });
+
+// Re-initialize galleries when admin content is shown (after password)
+function initializeAfterAuth() {
+    const gallerySelect = document.getElementById('gallery');
+    if (gallerySelect && gallerySelect.options.length <= 1) {
+        populateGalleryDropdown();
+        gallerySelect.addEventListener('change', updateUploadButton);
+    }
+}
 
 // Handle file selection
 function handleFileSelect(e) {
