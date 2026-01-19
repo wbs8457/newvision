@@ -109,9 +109,8 @@ function createGalleryItem(image, index) {
 
 // Load and display gallery
 async function loadGallery() {
-    return new Promise(async (resolve) => {
     const galleryGrid = document.getElementById('gallery-grid');
-    if (!galleryGrid) return;
+    if (!galleryGrid) return Promise.resolve();
     
     // Show loading state
     galleryGrid.innerHTML = `
@@ -133,7 +132,7 @@ async function loadGallery() {
                 <p class="text-muted">Please add images to the gallery or check your configuration.</p>
             </div>
         `;
-        return;
+        return Promise.resolve();
     }
     
     // Handle case where images array exists but is empty
@@ -145,7 +144,7 @@ async function loadGallery() {
                 <p class="text-muted">Add images to your gallery.json file to get started.</p>
             </div>
         `;
-        return;
+        return Promise.resolve();
     }
     
     // Clear loading state
@@ -158,11 +157,10 @@ async function loadGallery() {
     });
     
     // Initialize gallery filter
-    initializeGalleryFilter();
+    await initializeGalleryFilter();
     
-    // Resolve promise to indicate gallery is loaded
-    resolve();
-    });
+    // Wait a bit for DOM to update, then configure Lightbox
+    return Promise.resolve();
 }
 
 // Load galleries and create filter buttons

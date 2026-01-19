@@ -138,22 +138,43 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/js/lightbox.min.js"></script>
     <script>
         // Initialize gallery when page loads
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', async function() {
             if (typeof loadGallery === 'function') {
-                // Load gallery first, then configure Lightbox after items are created
-                loadGallery().then(() => {
-                    // Configure Lightbox options after gallery is loaded
-                    if (typeof lightbox !== 'undefined' && typeof lightbox.option === 'function' && window.SITE_CONFIG?.lightbox) {
-                        lightbox.option(window.SITE_CONFIG.lightbox);
-                    }
-                }).catch(() => {
-                    // If loadGallery doesn't return a promise, configure Lightbox anyway
-                    setTimeout(() => {
-                        if (typeof lightbox !== 'undefined' && typeof lightbox.option === 'function' && window.SITE_CONFIG?.lightbox) {
-                            lightbox.option(window.SITE_CONFIG.lightbox);
+                try {
+                    // Load gallery first, then configure Lightbox after items are created
+                    await loadGallery();
+                    
+                    // Wait for Lightbox to be available and configure it
+                    function configureLightbox() {
+                        if (typeof lightbox !== 'undefined' && typeof lightbox.option === 'function') {
+                            try {
+                                if (window.SITE_CONFIG?.lightbox) {
+                                    lightbox.option(window.SITE_CONFIG.lightbox);
+                                }
+                                return true;
+                            } catch (error) {
+                                console.error('Lightbox configuration error:', error);
+                                return false;
+                            }
                         }
-                    }, 500);
-                });
+                        return false;
+                    }
+                    
+                    // Try to configure immediately
+                    if (!configureLightbox()) {
+                        // Wait for Lightbox script to load
+                        const checkInterval = setInterval(() => {
+                            if (configureLightbox()) {
+                                clearInterval(checkInterval);
+                            }
+                        }, 50);
+                        
+                        // Give up after 2 seconds
+                        setTimeout(() => clearInterval(checkInterval), 2000);
+                    }
+                } catch (error) {
+                    console.error('Error loading gallery:', error);
+                }
             }
         });
     </script>
