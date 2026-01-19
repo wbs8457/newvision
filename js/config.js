@@ -26,9 +26,14 @@ const SITE_CONFIG = {
     // Cloudflare R2 Configuration
     r2: {
         // Set to null to use placeholder images, or provide your R2 bucket URL
-        // Format: 'https://your-account-id.r2.cloudflarestorage.com/your-bucket-name'
-        baseUrl: null,
-        usePlaceholders: true, // Set to false when using R2
+        // Bucket name: "newvision"
+        // Format options:
+        //   - Custom domain: 'https://yourdomain.com'
+        //   - Public R2 URL: 'https://pub-<account-id>.r2.dev/newvision'
+        //   - Or: 'https://<account-id>.r2.cloudflarestorage.com/newvision'
+        // To find account ID: Cloudflare Dashboard > Right sidebar > Account ID
+        baseUrl: null, // TODO: Set your R2 public URL here
+        usePlaceholders: true, // Set to false when using R2 (after baseUrl is set)
     },
     
     // Gallery Configuration
@@ -39,7 +44,7 @@ const SITE_CONFIG = {
     
     // Site URLs (update when you have a custom domain)
     urls: {
-        base: 'https://wbsnewvision.github.io', // Update with your GitHub Pages URL or custom domain
+        base: 'https://wbs8457.github.io/newvision', // GitHub Pages URL
         // base: 'https://wbsnewvision.com', // Custom domain example
     },
     
