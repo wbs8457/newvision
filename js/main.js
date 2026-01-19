@@ -68,8 +68,7 @@ function createGalleryItem(image, index) {
     const imageUrl = getImageUrl(image.filename, 'gallery', index);
     const fullImageUrl = getImageUrl(image.filename, 'full', index);
     
-    // Support both 'gallery' and 'category' for backward compatibility
-    const galleryId = image.gallery || image.category || 'all';
+    const galleryId = image.gallery || 'all';
     const galleryClass = galleryId ? `gallery-${galleryId}` : '';
     
     return `
@@ -200,9 +199,9 @@ async function initializeGalleryFilter() {
             filterButtons.forEach(btn => btn.classList.remove('active'));
             this.classList.add('active');
             
-            // Filter gallery items (support both data-gallery and data-category for backward compat)
+            // Filter gallery items
             galleryItems.forEach(item => {
-                const itemGallery = item.getAttribute('data-gallery') || item.getAttribute('data-category');
+                const itemGallery = item.getAttribute('data-gallery');
                 if (galleryId === 'all' || itemGallery === galleryId) {
                     item.style.display = 'block';
                 } else {

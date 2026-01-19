@@ -2,7 +2,7 @@
   "images": [
     {
       "filename": "portrait-001.webp",
-      "category": "portraits",
+      "gallery": "portraits",
       "title": "Portrait Session",
       "alt": "Professional portrait photography",
       "description": "A beautiful portrait session showcasing natural lighting and composition",
@@ -11,7 +11,7 @@
     },
     {
       "filename": "event-001.webp",
-      "category": "events",
+      "gallery": "events",
       "title": "Wedding Celebration",
       "alt": "Wedding event photography",
       "description": "Capturing the joy and emotion of a special day",
@@ -20,7 +20,7 @@
     },
     {
       "filename": "nature-001.webp",
-      "category": "nature",
+      "gallery": "nature",
       "title": "Mountain Landscape",
       "alt": "Nature landscape photography",
       "description": "Stunning mountain vista at golden hour",
@@ -29,7 +29,7 @@
     },
     {
       "filename": "commercial-001.webp",
-      "category": "commercial",
+      "gallery": "commercial",
       "title": "Product Photography",
       "alt": "Commercial product photography",
       "description": "Professional product photography for business",
@@ -38,7 +38,7 @@
     },
     {
       "filename": "portrait-002.webp",
-      "category": "portraits",
+      "gallery": "portraits",
       "title": "Family Portrait",
       "alt": "Family portrait photography",
       "description": "A warm family portrait session",
@@ -47,7 +47,7 @@
     },
     {
       "filename": "event-002.webp",
-      "category": "events",
+      "gallery": "events",
       "title": "Corporate Event",
       "alt": "Corporate event photography",
       "description": "Professional coverage of a corporate gathering",
@@ -56,7 +56,7 @@
     },
     {
       "filename": "portrait-003.webp",
-      "category": "portraits",
+      "gallery": "portraits",
       "title": "Senior Portrait",
       "alt": "Senior portrait photography",
       "description": "Elegant senior portrait session",
@@ -65,7 +65,7 @@
     },
     {
       "filename": "nature-002.webp",
-      "category": "nature",
+      "gallery": "nature",
       "title": "Sunset Over Lake",
       "alt": "Nature sunset photography",
       "description": "Breathtaking sunset reflecting on calm waters",
@@ -74,7 +74,7 @@
     },
     {
       "filename": "event-003.webp",
-      "category": "events",
+      "gallery": "events",
       "title": "Anniversary Party",
       "alt": "Anniversary event photography",
       "description": "Celebrating a milestone anniversary",
@@ -83,7 +83,7 @@
     },
     {
       "filename": "commercial-002.webp",
-      "category": "commercial",
+      "gallery": "commercial",
       "title": "Professional Headshot",
       "alt": "Business headshot photography",
       "description": "Professional headshot for business use",
@@ -92,7 +92,7 @@
     },
     {
       "filename": "portrait-004.webp",
-      "category": "portraits",
+      "gallery": "portraits",
       "title": "Couple Portrait",
       "alt": "Couple portrait photography",
       "description": "Romantic couple portrait session",
@@ -101,7 +101,7 @@
     },
     {
       "filename": "nature-003.webp",
-      "category": "nature",
+      "gallery": "nature",
       "title": "Forest Path",
       "alt": "Nature forest photography",
       "description": "Serene forest path in morning light",
@@ -110,7 +110,7 @@
     },
     {
       "filename": "event-004.webp",
-      "category": "events",
+      "gallery": "events",
       "title": "Birthday Celebration",
       "alt": "Birthday event photography",
       "description": "Joyful birthday celebration captured",
@@ -119,7 +119,7 @@
     },
     {
       "filename": "commercial-003.webp",
-      "category": "commercial",
+      "gallery": "commercial",
       "title": "Restaurant Photography",
       "alt": "Commercial restaurant photography",
       "description": "Appetizing food and restaurant ambiance",
@@ -128,7 +128,7 @@
     },
     {
       "filename": "portrait-005.webp",
-      "category": "portraits",
+      "gallery": "portraits",
       "title": "Maternity Portrait",
       "alt": "Maternity portrait photography",
       "description": "Beautiful maternity portrait session",
@@ -137,34 +137,12 @@
     },
     {
       "filename": "nature-004.webp",
-      "category": "nature",
+      "gallery": "nature",
       "title": "Ocean Waves",
       "alt": "Nature ocean photography",
       "description": "Powerful ocean waves at dawn",
       "featured": false,
       "date": "2024-04-01"
-    }
-  ],
-  "categories": [
-    {
-      "id": "portraits",
-      "name": "Portraits",
-      "description": "Professional portrait photography"
-    },
-    {
-      "id": "events",
-      "name": "Events",
-      "description": "Wedding and event photography"
-    },
-    {
-      "id": "nature",
-      "name": "Nature",
-      "description": "Landscape and nature photography"
-    },
-    {
-      "id": "commercial",
-      "name": "Commercial",
-      "description": "Commercial and business photography"
     }
   ]
 }
