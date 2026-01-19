@@ -22,7 +22,7 @@ export default {
       });
     }
 
-    // Handle GET requests for reading files (galleries.json, etc.)
+    // Handle GET requests for reading files (galleries.json, images, etc.)
     if (request.method === 'GET') {
       const path = url.searchParams.get('path') || url.pathname.replace(/^\//, '');
       
@@ -45,13 +45,30 @@ export default {
           });
         }
 
-        const data = await object.text();
-        const contentType = object.httpMetadata?.contentType || 'application/json';
+        // Determine content type based on file extension or metadata
+        let contentType = object.httpMetadata?.contentType;
+        if (!contentType) {
+          const ext = path.split('.').pop()?.toLowerCase();
+          const contentTypes = {
+            'json': 'application/json',
+            'webp': 'image/webp',
+            'jpg': 'image/jpeg',
+            'jpeg': 'image/jpeg',
+            'png': 'image/png',
+            'gif': 'image/gif',
+          };
+          contentType = contentTypes[ext] || 'application/octet-stream';
+        }
+
+        // For images, return as binary; for JSON, return as text
+        const isImage = contentType.startsWith('image/');
+        const data = isImage ? await object.arrayBuffer() : await object.text();
 
         return new Response(data, {
           headers: {
             'Content-Type': contentType,
             'Access-Control-Allow-Origin': '*',
+            'Cache-Control': 'public, max-age=31536000', // Cache images for 1 year
           },
         });
       } catch (error) {

@@ -73,7 +73,11 @@ function getImageUrl(filename, size = 'gallery', imageIndex = 0) {
         return `https://picsum.photos/id/${imageId}/${width}/${height}`;
     }
     
-    // Use R2 bucket
+    // Use R2 bucket via Worker to avoid CORS/auth issues
+    const workerUrl = (typeof window !== 'undefined' && window.SECRETS_CONFIG?.workerUrl) 
+        ? window.SECRETS_CONFIG.workerUrl 
+        : 'https://r2-upload-worker.bill-a4a.workers.dev';
+    
     const sizeMap = {
         'thumbnail': 'thumbnails',
         'gallery': 'gallery',
@@ -81,7 +85,15 @@ function getImageUrl(filename, size = 'gallery', imageIndex = 0) {
     };
     
     const folder = sizeMap[size] || 'gallery';
-    return `${CONFIG.R2_BASE_URL}/${folder}/${filename}`;
+    const imagePath = `${folder}/${filename}`;
+    
+    // Use Worker to proxy images (handles auth and CORS)
+    if (workerUrl) {
+        return `${workerUrl}/?path=${imagePath}`;
+    }
+    
+    // Fallback to direct R2 URL (may have auth issues)
+    return `${CONFIG.R2_BASE_URL}/${imagePath}`;
 }
 
 // Create gallery item HTML

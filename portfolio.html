@@ -142,20 +142,39 @@
                     // Load gallery first (creates DOM elements with data-lightbox attributes)
                     await loadGallery();
                     
+                    // Wait a moment for DOM to fully update
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    
                     // Load Lightbox2 AFTER gallery items are created
                     const lightboxScript = document.createElement('script');
                     lightboxScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/js/lightbox.min.js';
+                    lightboxScript.onerror = function() {
+                        console.error('Failed to load Lightbox2 script');
+                    };
                     lightboxScript.onload = function() {
-                        // Configure Lightbox options after it loads
-                        if (typeof lightbox !== 'undefined' && typeof lightbox.option === 'function') {
-                            try {
-                                if (window.SITE_CONFIG?.lightbox) {
-                                    lightbox.option(window.SITE_CONFIG.lightbox);
+                        // Wait a bit more for Lightbox to fully initialize
+                        setTimeout(() => {
+                            if (typeof lightbox !== 'undefined') {
+                                try {
+                                    // Configure Lightbox options
+                                    if (typeof lightbox.option === 'function' && window.SITE_CONFIG?.lightbox) {
+                                        lightbox.option(window.SITE_CONFIG.lightbox);
+                                    }
+                                    // Manually bind to existing elements if needed
+                                    if (typeof lightbox.start === 'function') {
+                                        // Lightbox2 should auto-bind, but we can force it
+                                        const lightboxLinks = document.querySelectorAll('a[data-lightbox]');
+                                        lightboxLinks.forEach(link => {
+                                            if (!link.hasAttribute('data-lightbox-bound')) {
+                                                link.setAttribute('data-lightbox-bound', 'true');
+                                            }
+                                        });
+                                    }
+                                } catch (error) {
+                                    console.error('Lightbox configuration error:', error);
                                 }
-                            } catch (error) {
-                                console.error('Lightbox configuration error:', error);
                             }
-                        }
+                        }, 50);
                     };
                     document.head.appendChild(lightboxScript);
                 } catch (error) {
