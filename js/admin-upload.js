@@ -194,10 +194,12 @@ function updatePreviews() {
     
     selectedImages.forEach((item, index) => {
         const div = document.createElement('div');
-        div.className = 'image-preview col-md-6 col-lg-4';
+        // Use Bootstrap grid so we get 1 per row on mobile, 2 on md, 3 on lg
+        div.className = 'image-preview col-12 col-md-6 col-lg-4';
         
         const img = document.createElement('img');
-        img.src = URL.createObjectURL(item.file);
+        const imgUrl = URL.createObjectURL(item.file);
+        img.src = imgUrl;
         img.className = 'img-fluid';
         img.style.maxHeight = '200px';
         
@@ -218,16 +220,16 @@ function updatePreviews() {
             <div class="text-muted">${(item.file.size / 1024).toFixed(1)} KB</div>
             <div class="resize-preview mt-2">
                 <div class="resize-preview-item">
-                    <div>Thumb</div>
-                    <div class="bg-secondary" style="width: 40px; height: 30px; border-radius: 0.25rem;"></div>
+                    <div>Thumb (400px)</div>
+                    <img src="${imgUrl}" style="width: 70px; height: 70px; object-fit: cover; border-radius: 0.25rem; border: 1px solid #dee2e6;">
                 </div>
                 <div class="resize-preview-item">
-                    <div>Gallery</div>
-                    <div class="bg-secondary" style="width: 80px; height: 60px; border-radius: 0.25rem;"></div>
+                    <div>Gallery (800px)</div>
+                    <img src="${imgUrl}" style="width: 100px; height: 75px; object-fit: cover; border-radius: 0.25rem; border: 1px solid #dee2e6;">
                 </div>
                 <div class="resize-preview-item">
-                    <div>Full</div>
-                    <div class="bg-secondary" style="width: 120px; height: 90px; border-radius: 0.25rem;"></div>
+                    <div>Full (1200px)</div>
+                    <img src="${imgUrl}" style="width: 120px; height: 90px; object-fit: cover; border-radius: 0.25rem; border: 1px solid #dee2e6;">
                 </div>
             </div>
         `;
