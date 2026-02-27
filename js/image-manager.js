@@ -22,40 +22,36 @@ async function loadGalleries() {
     return [];
 }
 
-// Load all images from gallery.json
+// Load all images from gallery.json (single source of truth = R2 via Worker)
 async function loadAllImages() {
     const workerUrl = R2_CONFIG.workerUrl;
-    let galleryData = { images: [] };
-    
-    // Try to load from R2 via Worker (no caching)
-    if (workerUrl) {
-        try {
-            const url = `${workerUrl}?path=data/gallery.json&ts=${Date.now()}`;
-            const response = await fetch(url, { cache: 'no-store' });
-            if (response.ok) {
-                galleryData = await response.json();
-            } else if (response.status === 404) {
-                console.log('gallery.json not found in R2');
-            }
-        } catch (error) {
-            console.error('Error loading gallery.json from R2:', error);
-        }
+    if (!workerUrl) {
+        console.error('Worker URL not configured. Cannot load images from R2.');
+        allImages = [];
+        return allImages;
     }
-    
-    // Fallback to local file
-    if (galleryData.images.length === 0) {
-        try {
-            const response = await fetch('data/gallery.json', { cache: 'no-store' });
-            if (response.ok) {
-                galleryData = await response.json();
-            }
-        } catch (error) {
-            console.error('Error loading local gallery.json:', error);
+
+    try {
+        const url = `${workerUrl}?path=data/gallery.json&ts=${Date.now()}`;
+        const response = await fetch(url, { cache: 'no-store' });
+        if (response.ok) {
+            const galleryData = await response.json();
+            allImages = galleryData.images || [];
+            return allImages;
+        } else if (response.status === 404) {
+            console.warn('gallery.json not found in R2, treating as empty gallery.');
+            allImages = [];
+            return allImages;
+        } else {
+            console.error('Error loading gallery.json from R2:', response.status, response.statusText);
+            allImages = [];
+            return allImages;
         }
+    } catch (error) {
+        console.error('Error loading gallery.json from R2:', error);
+        allImages = [];
+        return allImages;
     }
-    
-    allImages = galleryData.images || [];
-    return allImages;
 }
 
 // Render images list
@@ -248,12 +244,23 @@ async function deleteImage(index) {
     allImages = allImages.filter(img => !(img.filename === image.filename && img.gallery === image.gallery));
     
     // Save to R2
-    await saveGalleryJson();
+    const ok = await saveGalleryJson();
+    if (!ok) {
+        // Reload from server to avoid local / remote mismatch
+        await refreshImagesList();
+        return;
+    }
     
-    // Refresh list
+    // Refresh list from R2
     await refreshImagesList();
-    
-    alert('Image removed from gallery!');
+
+    // Verify it's actually gone
+    const stillThere = allImages.some(img => img.filename === image.filename && img.gallery === image.gallery);
+    if (stillThere) {
+        alert('Failed to remove image from gallery.json. Please check R2 / worker logs.');
+    } else {
+        alert('Image removed from gallery!');
+    }
 }
 
 // Save gallery.json to R2
