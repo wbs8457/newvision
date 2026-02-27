@@ -27,10 +27,11 @@ async function loadAllImages() {
     const workerUrl = R2_CONFIG.workerUrl;
     let galleryData = { images: [] };
     
-    // Try to load from R2 via Worker
+    // Try to load from R2 via Worker (no caching)
     if (workerUrl) {
         try {
-            const response = await fetch(`${workerUrl}?path=data/gallery.json`);
+            const url = `${workerUrl}?path=data/gallery.json&ts=${Date.now()}`;
+            const response = await fetch(url, { cache: 'no-store' });
             if (response.ok) {
                 galleryData = await response.json();
             } else if (response.status === 404) {
@@ -44,7 +45,7 @@ async function loadAllImages() {
     // Fallback to local file
     if (galleryData.images.length === 0) {
         try {
-            const response = await fetch('data/gallery.json');
+            const response = await fetch('data/gallery.json', { cache: 'no-store' });
             if (response.ok) {
                 galleryData = await response.json();
             }
@@ -281,14 +282,20 @@ async function saveGalleryJson() {
         if (response.ok) {
             return true;
         } else {
-            const error = await response.json();
-            console.error('Failed to save gallery.json:', error);
-            alert('Failed to save changes. Please try again.');
+            let errorText = '';
+            try {
+                const data = await response.json();
+                errorText = data.error || JSON.stringify(data);
+            } catch (_) {
+                errorText = await response.text();
+            }
+            console.error('Failed to save gallery.json:', response.status, errorText);
+            alert('Failed to save changes to R2.\n\nDetails: ' + errorText);
             return false;
         }
     } catch (error) {
         console.error('Error saving gallery.json:', error);
-        alert('Error saving changes. Please try again.');
+        alert('Error saving changes to R2.\n\nDetails: ' + (error.message || String(error)));
         return false;
     }
 }
