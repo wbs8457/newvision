@@ -188,10 +188,14 @@ async function loadGallery() {
 // Load galleries and create filter buttons
 async function loadGalleriesForFilter() {
     // Try R2 via Worker first (avoids CORS issues)
-    const workerUrl = window.SITE_CONFIG?.r2?.workerUrl || (typeof R2_CONFIG !== 'undefined' ? R2_CONFIG.workerUrl : null);
+    const workerUrl = (typeof window !== 'undefined' && window.SECRETS_CONFIG?.workerUrl) 
+        ? window.SECRETS_CONFIG.workerUrl 
+        : 'https://r2-upload-worker.bill-a4a.workers.dev';
     if (workerUrl) {
         try {
-            const response = await fetch(`${workerUrl}?path=data/galleries.json`);
+            // Bust caches so we always get the latest galleries.json from R2
+            const url = `${workerUrl}?path=data/galleries.json&ts=${Date.now()}`;
+            const response = await fetch(url, { cache: 'no-store' });
             if (response.ok) {
                 const text = await response.text();
                 const data = JSON.parse(text);
