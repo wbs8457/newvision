@@ -244,8 +244,8 @@ async function deleteImage(index) {
         return;
     }
     
-    // Remove from array
-    allImages.splice(index, 1);
+    // Remove from array (all occurrences of this filename in this gallery)
+    allImages = allImages.filter(img => !(img.filename === image.filename && img.gallery === image.gallery));
     
     // Save to R2
     await saveGalleryJson();
