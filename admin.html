@@ -101,9 +101,14 @@
                 document.head.appendChild(script);
             };
             
-            // Load optional files silently
-            loadScript('js/config-secrets.js');
-            loadScript('tokens.local.js');
+            // Load optional files silently (development/local only)
+            const isLocalEnv = (location.hostname === 'localhost' || 
+                                location.hostname === '127.0.0.1' || 
+                                location.hostname === '');
+            if (isLocalEnv) {
+                loadScript('js/config-secrets.js');
+                loadScript('tokens.local.js');
+            }
             
             // Restore console.error after a short delay
             setTimeout(() => {
