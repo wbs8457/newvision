@@ -9,7 +9,9 @@ async function loadGalleriesForManagement() {
     const workerUrl = R2_CONFIG.workerUrl;
     if (workerUrl) {
         try {
-            const response = await fetch(`${workerUrl}?path=data/galleries.json`);
+            // Bust caches so we always see the most recent galleries.json from R2
+            const url = `${workerUrl}?path=data/galleries.json&ts=${Date.now()}`;
+            const response = await fetch(url, { cache: 'no-store' });
             if (response.ok) {
                 const text = await response.text();
                 const data = JSON.parse(text);
