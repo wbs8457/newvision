@@ -153,6 +153,9 @@ function saveGalleryFromModal() {
     
     renderGalleriesList();
     
+    // Persist immediately to R2
+    saveGalleries();
+    
     // Close modal
     const modal = bootstrap.Modal.getInstance(document.getElementById('galleryEditModal'));
     if (modal) modal.hide();
@@ -203,6 +206,8 @@ function removeGallery(index) {
     if (confirm('Are you sure you want to remove this gallery? Images assigned to this gallery will need to be reassigned.')) {
         currentGalleries.splice(index, 1);
         renderGalleriesList();
+        // Persist deletion immediately to R2
+        saveGalleries();
     }
 }
 
