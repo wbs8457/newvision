@@ -37,7 +37,7 @@ async function loadGalleriesForManagement() {
     }
 }
 
-// Save galleries to R2 or generate download
+// Save galleries to R2
 async function saveGalleriesToR2(galleries) {
     const galleriesData = { galleries };
     const jsonString = JSON.stringify(galleriesData, null, 2);
@@ -58,21 +58,25 @@ async function saveGalleriesToR2(galleries) {
             
             if (response.ok) {
                 return { success: true, method: 'r2' };
+            } else {
+                // Try to read error details from worker
+                let errorText = '';
+                try {
+                    const data = await response.json();
+                    errorText = data.error || JSON.stringify(data);
+                } catch (_) {
+                    errorText = await response.text();
+                }
+                console.error('R2 upload failed with status', response.status, errorText);
+                return { success: false, method: 'r2', status: response.status, error: errorText };
             }
         } catch (error) {
             console.error('R2 upload failed:', error);
+            return { success: false, method: 'r2', error: error.message || String(error) };
         }
     }
     
-    // Fallback: download file for manual upload
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'galleries.json';
-    a.click();
-    URL.revokeObjectURL(url);
-    
-    return { success: true, method: 'download', message: 'File downloaded. Upload to R2 bucket at data/galleries.json' };
+    return { success: false, method: 'none', error: 'R2 worker URL not configured' };
 }
 
 // Load and render galleries in the tab
@@ -284,19 +288,16 @@ async function saveGalleries() {
     // Save
     const result = await saveGalleriesToR2(validGalleries);
     
-    if (result.success) {
-        if (result.method === 'r2') {
-            alert('✅ Galleries saved successfully to R2!');
-            // Reload dropdown
-            if (typeof populateGalleryDropdown === 'function') {
-                await populateGalleryDropdown();
-            }
-            // Reload galleries list
-            await loadAndRenderGalleries();
-        } else {
-            alert('Galleries file downloaded. Please upload it to your R2 bucket at data/galleries.json, then refresh the page.');
+    if (result.success && result.method === 'r2') {
+        alert('✅ Galleries saved successfully to R2!');
+        // Reload dropdown
+        if (typeof populateGalleryDropdown === 'function') {
+            await populateGalleryDropdown();
         }
+        // Reload galleries list
+        await loadAndRenderGalleries();
     } else {
-        alert('Failed to save galleries. Please try again.');
+        const extra = result && result.error ? `\n\nDetails: ${result.error}` : '';
+        alert('Failed to save galleries to R2.' + extra);
     }
 }
