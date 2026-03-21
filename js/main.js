@@ -246,25 +246,23 @@ async function initializeGalleryFilter() {
     const filterContainer = document.querySelector('.btn-group[role="group"]');
     if (!filterContainer) return;
     
-    // Load galleries dynamically
+    // Always drive filter IDs from rendered image cards to guarantee exact matches.
+    const galleryItems = Array.from(document.querySelectorAll('.gallery-item'));
+    const galleryIds = Array.from(
+        new Set(
+            galleryItems
+                .map(item => normalizeGalleryId(item.getAttribute('data-gallery')))
+                .filter(Boolean)
+        )
+    );
+
+    // Optional labels from galleries.json (only for display names).
     const galleries = await loadGalleriesForFilter();
-    // Also derive gallery IDs from currently rendered images. This guarantees
-    // a filter button exists even when galleries.json is stale.
-    const galleryIdsFromImages = Array.from(document.querySelectorAll('.gallery-item'))
-        .map(item => item.getAttribute('data-gallery'))
-        .filter(Boolean);
-    const existingIds = new Set(galleries.map(g => normalizeGalleryId(g.id)));
-    galleryIdsFromImages.forEach((rawId) => {
-        const id = normalizeGalleryId(rawId);
-        if (id && !existingIds.has(id)) {
-            galleries.push({
-                id,
-                name: id.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase()),
-                description: ''
-            });
-            existingIds.add(id);
-        }
-    });
+    const galleryNameById = new Map(
+        galleries
+            .map(g => [normalizeGalleryId(g.id), g.name])
+            .filter(([id]) => Boolean(id))
+    );
     
     // Clear existing buttons (except "All")
     const allButton = filterContainer.querySelector('[data-gallery="all"]');
@@ -282,21 +280,19 @@ async function initializeGalleryFilter() {
         filterContainer.appendChild(allBtn);
     }
     
-    // Add gallery buttons
-    galleries.forEach(gallery => {
-        const normalizedId = normalizeGalleryId(gallery.id);
+    // Add gallery buttons based on IDs actually present in gallery items.
+    galleryIds.forEach((normalizedId) => {
         if (!normalizedId || normalizedId === 'all') return;
         const btn = document.createElement('button');
         btn.type = 'button';
         btn.className = 'btn btn-outline-primary';
         btn.setAttribute('data-gallery', normalizedId);
-        btn.textContent = gallery.name || normalizedId;
+        btn.textContent = galleryNameById.get(normalizedId) || normalizedId.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
         filterContainer.appendChild(btn);
     });
     
     // Attach event listeners
     const filterButtons = filterContainer.querySelectorAll('[data-gallery]');
-    const galleryItems = document.querySelectorAll('.gallery-item');
     
     filterButtons.forEach(button => {
         button.addEventListener('click', function() {
