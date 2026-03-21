@@ -228,6 +228,22 @@ async function initializeGalleryFilter() {
     
     // Load galleries dynamically
     const galleries = await loadGalleriesForFilter();
+    // Also derive gallery IDs from currently rendered images. This guarantees
+    // a filter button exists even when galleries.json is stale.
+    const galleryIdsFromImages = Array.from(document.querySelectorAll('.gallery-item'))
+        .map(item => item.getAttribute('data-gallery'))
+        .filter(Boolean);
+    const existingIds = new Set(galleries.map(g => g.id));
+    galleryIdsFromImages.forEach((id) => {
+        if (!existingIds.has(id)) {
+            galleries.push({
+                id,
+                name: id.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase()),
+                description: ''
+            });
+            existingIds.add(id);
+        }
+    });
     
     // Clear existing buttons (except "All")
     const allButton = filterContainer.querySelector('[data-gallery="all"]');
