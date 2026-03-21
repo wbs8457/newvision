@@ -191,15 +191,7 @@
                     const lightbox = GLightbox({
                         selector: 'a[data-glightbox]',
                         touchNavigation: true,
-                        loop: true,
-                        description: function(element) {
-                            const title = element.getAttribute('data-glightbox-title') || '';
-                            const desc = element.getAttribute('data-glightbox-description') || '';
-                            if (title && desc) {
-                                return `<strong>${title}</strong><br>${desc}`;
-                            }
-                            return title || desc;
-                        }
+                        loop: true
                     });
                 }
             }, 500);

@@ -158,16 +158,7 @@
                                 selector: 'a[data-glightbox]',
                                 touchNavigation: true,
                                 loop: true,
-                                autoplayVideos: false,
-                                // Custom description rendering
-                                description: function(element) {
-                                    const title = element.getAttribute('data-glightbox-title') || '';
-                                    const desc = element.getAttribute('data-glightbox-description') || '';
-                                    if (title && desc) {
-                                        return `<strong>${title}</strong><br>${desc}`;
-                                    }
-                                    return title || desc;
-                                }
+                                autoplayVideos: false
                             });
                             console.log('GLightbox initialized with', lightboxElements.length, 'elements');
                         } else {
@@ -180,15 +171,7 @@
                                         selector: 'a[data-glightbox]',
                                         touchNavigation: true,
                                         loop: true,
-                                        autoplayVideos: false,
-                                        description: function(element) {
-                                            const title = element.getAttribute('data-glightbox-title') || '';
-                                            const desc = element.getAttribute('data-glightbox-description') || '';
-                                            if (title && desc) {
-                                                return `<strong>${title}</strong><br>${desc}`;
-                                            }
-                                            return title || desc;
-                                        }
+                                        autoplayVideos: false
                                     });
                                     console.log('GLightbox initialized on retry with', retryElements.length, 'elements');
                                 }

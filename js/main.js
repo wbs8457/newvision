@@ -96,6 +96,19 @@ function getImageUrl(filename, size = 'gallery', imageIndex = 0) {
     return `${CONFIG.R2_BASE_URL}/${imagePath}`;
 }
 
+function toSafeString(value) {
+    if (value === null || value === undefined) return '';
+    return String(value);
+}
+
+function escapeHtmlAttr(value) {
+    return toSafeString(value)
+        .replace(/&/g, '&amp;')
+        .replace(/"/g, '&quot;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+}
+
 // Create gallery item HTML
 function createGalleryItem(image, index) {
     const imageUrl = getImageUrl(image.filename, 'gallery', index);
@@ -109,15 +122,19 @@ function createGalleryItem(image, index) {
         ? `${image.title || ''}\n${image.description}`.trim()
         : (image.title || '');
     
+    const title = escapeHtmlAttr(image.title);
+    const description = escapeHtmlAttr(image.description);
+    const alt = escapeHtmlAttr(image.alt || image.title || 'Gallery image');
+
     return `
         <div class="col-md-6 col-lg-4 mb-4 gallery-item ${galleryClass}" data-gallery="${galleryId}" data-index="${index}">
             <a href="${fullImageUrl}" 
                data-glightbox="type: image" 
-               data-glightbox-title="${image.title || ''}"
-               data-glightbox-description="${image.description || ''}">
+               data-glightbox-title="${title}"
+               data-glightbox-description="${description}">
                 <div class="ratio ratio-4x3">
                     <img src="${imageUrl}" 
-                         alt="${image.alt || image.title || 'Gallery image'}" 
+                         alt="${alt}" 
                          class="img-fluid rounded"
                          loading="lazy"
                          onerror="this.src='https://via.placeholder.com/800x600/cccccc/666666?text=Image+Loading'">
@@ -321,16 +338,19 @@ async function loadFeaturedImages() {
     featuredImages.forEach((image, index) => {
         const imageUrl = getImageUrl(image.filename, 'gallery', index);
         const fullImageUrl = getImageUrl(image.filename, 'full', index);
+        const title = escapeHtmlAttr(image.title);
+        const description = escapeHtmlAttr(image.description);
+        const alt = escapeHtmlAttr(image.alt || image.title || 'Featured image');
         
         const itemHTML = `
             <div class="col-md-6 col-lg-4 mb-4">
                 <a href="${fullImageUrl}" 
                    data-glightbox="type: image" 
-                   data-glightbox-title="${image.title || ''}"
-                   data-glightbox-description="${image.description || ''}">
+                   data-glightbox-title="${title}"
+                   data-glightbox-description="${description}">
                     <div class="ratio ratio-4x3 gallery-item">
                         <img src="${imageUrl}" 
-                             alt="${image.alt || image.title || 'Featured image'}" 
+                             alt="${alt}" 
                              class="img-fluid rounded"
                              loading="lazy"
                              onerror="this.src='https://via.placeholder.com/800x600/cccccc/666666?text=Image+Loading'">
