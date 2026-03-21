@@ -9,8 +9,11 @@ const CONFIG = {
     USE_PLACEHOLDERS: window.SITE_CONFIG?.r2?.usePlaceholders !== false,
 };
 
-// Lightbox2 auto-binds to elements with data-lightbox attribute
-// Configuration is handled in portfolio.html after gallery loads
+let portfolioLightboxInstance = null;
+
+function normalizeGalleryId(value) {
+    return toSafeString(value).trim().toLowerCase();
+}
 
 // Load gallery data from R2 via Worker or local file
 async function loadGalleryData() {
@@ -114,7 +117,7 @@ function createGalleryItem(image, index) {
     const imageUrl = getImageUrl(image.filename, 'gallery', index);
     const fullImageUrl = getImageUrl(image.filename, 'full', index);
     
-    const galleryId = image.gallery || 'all';
+    const galleryId = normalizeGalleryId(image.gallery || 'all');
     const galleryClass = galleryId ? `gallery-${galleryId}` : '';
     
     // Build description for lightbox
@@ -195,9 +198,9 @@ async function loadGallery() {
     
     // Initialize gallery filter
     await initializeGalleryFilter();
-    
-    // Lightbox2 will auto-bind to new elements with data-lightbox attribute
-    // No manual initialization needed - it handles dynamic content automatically
+
+    // Initialize/rebuild portfolio lightbox after DOM is rendered.
+    initializePortfolioLightbox();
     
     return Promise.resolve();
 }
@@ -250,9 +253,10 @@ async function initializeGalleryFilter() {
     const galleryIdsFromImages = Array.from(document.querySelectorAll('.gallery-item'))
         .map(item => item.getAttribute('data-gallery'))
         .filter(Boolean);
-    const existingIds = new Set(galleries.map(g => g.id));
-    galleryIdsFromImages.forEach((id) => {
-        if (!existingIds.has(id)) {
+    const existingIds = new Set(galleries.map(g => normalizeGalleryId(g.id)));
+    galleryIdsFromImages.forEach((rawId) => {
+        const id = normalizeGalleryId(rawId);
+        if (id && !existingIds.has(id)) {
             galleries.push({
                 id,
                 name: id.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase()),
@@ -280,11 +284,13 @@ async function initializeGalleryFilter() {
     
     // Add gallery buttons
     galleries.forEach(gallery => {
+        const normalizedId = normalizeGalleryId(gallery.id);
+        if (!normalizedId || normalizedId === 'all') return;
         const btn = document.createElement('button');
         btn.type = 'button';
         btn.className = 'btn btn-outline-primary';
-        btn.setAttribute('data-gallery', gallery.id);
-        btn.textContent = gallery.name;
+        btn.setAttribute('data-gallery', normalizedId);
+        btn.textContent = gallery.name || normalizedId;
         filterContainer.appendChild(btn);
     });
     
@@ -294,7 +300,7 @@ async function initializeGalleryFilter() {
     
     filterButtons.forEach(button => {
         button.addEventListener('click', function() {
-            const galleryId = this.getAttribute('data-gallery');
+            const galleryId = normalizeGalleryId(this.getAttribute('data-gallery'));
             
             // Update active button
             filterButtons.forEach(btn => btn.classList.remove('active'));
@@ -302,13 +308,45 @@ async function initializeGalleryFilter() {
             
             // Filter gallery items
             galleryItems.forEach(item => {
-                const itemGallery = item.getAttribute('data-gallery');
+                const itemGallery = normalizeGalleryId(item.getAttribute('data-gallery'));
                 if (galleryId === 'all' || itemGallery === galleryId) {
-                    item.style.display = 'block';
+                    item.style.display = '';
                 } else {
                     item.style.display = 'none';
                 }
             });
+        });
+    });
+}
+
+function initializePortfolioLightbox() {
+    if (typeof GLightbox === 'undefined') return;
+
+    const links = Array.from(document.querySelectorAll('#gallery-grid a[data-glightbox]'));
+    if (!links.length) return;
+
+    const elements = links.map((link) => ({
+        href: link.getAttribute('href'),
+        type: 'image',
+        title: toSafeString(link.getAttribute('data-glightbox-title')),
+        description: toSafeString(link.getAttribute('data-glightbox-description'))
+    }));
+
+    if (portfolioLightboxInstance && typeof portfolioLightboxInstance.destroy === 'function') {
+        portfolioLightboxInstance.destroy();
+    }
+
+    portfolioLightboxInstance = GLightbox({
+        elements,
+        touchNavigation: true,
+        loop: true,
+        autoplayVideos: false
+    });
+
+    links.forEach((link, index) => {
+        link.addEventListener('click', function(event) {
+            event.preventDefault();
+            portfolioLightboxInstance.openAt(index);
         });
     });
 }
